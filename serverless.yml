@@ -1,0 +1,27 @@
+service: klaims
+frameworkVersion: '3'
+plugins:
+  - serverless-domain-manager
+
+params:
+  dev:
+    ENV: 'dev'
+
+provider:
+  name: aws
+  runtime: java17
+  memorySize: 700
+  timeout: 800
+
+package:
+  individually: true
+  exclude:
+    - ./**
+
+functions:
+    klaims-core:
+        handler: io.micronaut.function.aws.proxy.payload2.APIGatewayV2HTTPEventFunction
+        events:
+        - httpApi:
+            path: /api/v1
+            method: get

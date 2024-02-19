@@ -1,0 +1,117 @@
+plugins {
+    id("com.github.johnrengelman.shadow")
+    id("io.micronaut.application") version "$micronautVersion"
+    id("io.micronaut.aot") version "$micronautVersion"
+    id 'java'
+}
+
+group = 'com.klaimz'
+version = '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    create("localRuntime")
+}
+
+tasks.register('runLocal', JavaExec) {
+    def stage = 'dev'
+    def env = new HashMap<String, String>()
+    env["ENV"] = stage
+
+    setEnvironment(env)
+    print(configurations.getByName("localRuntime"))
+    classpath = configurations.getByName("localRuntime") + sourceSets.main.runtimeClasspath
+    mainClass = "com.klaimz.Application"
+    args("--micronaut.runtime=netty")
+}
+
+shadowJar{
+    archiveBaseName.set('klaimz-core')
+    archiveClassifier.set('')
+    archiveVersion.set('')
+}
+
+dependencies {
+    localRuntime("io.micronaut:micronaut-http-server-netty:$micronautVersion")
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor("io.micronaut:micronaut-http-validation")
+    annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
+
+    annotationProcessor("io.micronaut.security:micronaut-security-annotations")
+
+    implementation("io.micronaut:micronaut-jackson-databind")
+    implementation("io.micronaut.aws:micronaut-aws-sdk-v2")
+    implementation("io.micronaut.crac:micronaut-crac")
+    implementation("io.micronaut.validation:micronaut-validation")
+    implementation("jakarta.validation:jakarta.validation-api")
+    implementation("io.micronaut.aws:micronaut-function-aws-api-proxy")
+
+    implementation("io.micronaut.security:micronaut-security-jwt")
+    implementation 'io.projectreactor:reactor-core:3.6.3'
+
+
+    annotationProcessor("io.micronaut.data:micronaut-data-document-processor")
+    implementation("io.micronaut.data:micronaut-data-mongodb")
+    runtimeOnly("org.mongodb:mongodb-driver-sync")
+
+    runtimeOnly("ch.qos.logback:logback-classic")
+
+
+
+
+    testImplementation("io.micronaut:micronaut-http-client")
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+application {
+    mainClass.set("com.klaimz.Application")
+}
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+    targetCompatibility = JavaVersion.toVersion("17")
+}
+
+test {
+    useJUnitPlatform()
+}
+
+
+graalvmNative.toolchainDetection = false
+micronaut {
+    runtime("lambda_java")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("com.klaimz.*")
+    }
+    aot {
+        // Please review carefully the optimizations enabled below
+        // Check https://micronaut-projects.github.io/micronaut-aot/latest/guide/ for more details
+        optimizeServiceLoading = false
+        convertYamlToJava = false
+        precomputeOperations = true
+        cacheEnvironment = true
+        optimizeClassLoading = true
+        deduceEnvironment = true
+        optimizeNetty = true
+    }
+}
+
+
+tasks.named("dockerfileNative") {
+    baseImage = "amazonlinux:2"
+    jdkVersion = "17"
+    args(
+            "-XX:MaximumHeapSizePercent=80",
+            "-Dio.netty.allocator.numDirectArenas=0",
+            "-Dio.netty.noPreferDirect=true"
+    )
+}
+
+
+
