@@ -7,7 +7,6 @@ import com.klaimz.service.UserService;
 import com.klaimz.util.HashUtils;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpRequest;
-import io.micronaut.http.server.netty.RoutingInBoundHandler;
 import io.micronaut.security.authentication.*;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -37,7 +36,7 @@ public class BasicAuthProvider implements AuthenticationProvider<HttpRequest<?>>
             return Mono.just(new AuthenticationFailed(AuthenticationFailureReason.CUSTOM));
         }
 
-        Optional<LoginData> optionalLoginData = loginRepository.findById(email);
+        Optional<LoginData> optionalLoginData = loginRepository.findByEmail(email);
 
         if (optionalLoginData.isEmpty()) {
             return Mono.just(new AuthenticationFailed(AuthenticationFailureReason.USER_NOT_FOUND));
@@ -54,11 +53,13 @@ public class BasicAuthProvider implements AuthenticationProvider<HttpRequest<?>>
                 return Mono.just(new AuthenticationFailed(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH));
             }
 
-            Optional<User> optionalUser = userService.getUserByEmail(email);
+            Optional<User> optionalUser = userService.getUserById(loginData.getId());
 
             if (optionalUser.isEmpty()) {
                 return Mono.just(new AuthenticationFailed(AuthenticationFailureReason.USER_NOT_FOUND));
             }
+
+            userService.updateLoginDate(optionalUser.get().getId());
 
             return Flux.create(emitter -> {
                 emitter.next(AuthenticationResponse.success(optionalUser.get().getId()));

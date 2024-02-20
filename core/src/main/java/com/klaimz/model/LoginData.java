@@ -17,7 +17,9 @@ import lombok.NoArgsConstructor;
 public class LoginData {
 
     @Id
+    private String id;
     private String email;
+
     private String passwordHash;
 
     @Builder.Default

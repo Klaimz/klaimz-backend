@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface LoginRepository extends CrudRepository<LoginData, String> {
 
     Optional<LoginData> findByToken(String token);
+    Optional<LoginData> findByEmail(String email);
 }

@@ -10,6 +10,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -72,11 +73,19 @@ public class UserService {
         var createdUser = userRepository.save(signUp.convertToUser());
 
         loginRepository.save(LoginData.builder()
+                .id(createdUser.getId())
                 .email(signUp.getEmail())
                 .passwordHash(HashUtils.hash(signUp.getPassword()))
                 .build());
 
         return createdUser;
+    }
+
+    public void updateLoginDate(String id) {
+        getUserById(id).ifPresent(user -> {
+            user.setLastLoginDate(new Date());
+            userRepository.update(user);
+        });
     }
 
     public Optional<User> getUserByEmail(String email) {
