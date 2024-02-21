@@ -1,6 +1,7 @@
 package com.klaimz.api.auth;
 
 import com.klaimz.repo.LoginRepository;
+import com.klaimz.service.UserService;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.errors.OauthErrorResponseException;
 import io.micronaut.security.token.event.RefreshTokenGeneratedEvent;
@@ -18,7 +19,7 @@ public class RefreshTokenHandler implements RefreshTokenPersistence {
 
 
     @Inject
-    private LoginRepository loginRepository;
+    private UserService userService;
 
     @Override
     public void persistToken(RefreshTokenGeneratedEvent event) {
@@ -28,19 +29,14 @@ public class RefreshTokenHandler implements RefreshTokenPersistence {
                 event.getAuthentication().getName() != null) {
             String payload = event.getRefreshToken();
             System.out.println("Auth username" + event.getAuthentication().getName() + " Refresh token: " + payload);
-            var loginData = loginRepository.findById(event.getAuthentication().getName());
-            if (loginData.isPresent()) {
-                var login = loginData.get();
-                login.setToken(payload);
-                loginRepository.update(login);
-            }
+            userService.updateToken(event.getAuthentication().getName(), payload);
         }
     }
 
     @Override
     public Publisher<Authentication> getAuthentication(String refreshToken) {
         return Flux.create(emitter -> {
-            var loginData = loginRepository.findByToken(refreshToken);
+            var loginData = userService.getLoginDataByToken(refreshToken);
 
             if (loginData.isEmpty()) {
                 emitter.error(new OauthErrorResponseException(INVALID_GRANT, "refresh token not found", null));

@@ -1,0 +1,38 @@
+{
+  "version": "2.0",
+  "routeKey": "GET /warmup",
+  "rawPath": "/warmup",
+  "rawQueryString": "",
+  "headers": {
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate, br",
+    "cache-control": "no-cache",
+    "content-length": "0",
+    "host": "tx9sx138k3.execute-api.ap-south-1.amazonaws.com",
+    "postman-token": "fe758660-aee6-4015-9812-c4cf392b5807",
+    "user-agent": "PostmanRuntime/7.36.3",
+    "x-amzn-trace-id": "Root=1-65d497dd-4929a2883c4cd1ab481c9486",
+    "x-forwarded-for": "114.29.226.236",
+    "x-forwarded-port": "443",
+    "x-forwarded-proto": "https"
+  },
+  "requestContext": {
+    "accountId": "992382722247",
+    "apiId": "tx9sx138k3",
+    "domainName": "tx9sx138k3.execute-api.ap-south-1.amazonaws.com",
+    "domainPrefix": "tx9sx138k3",
+    "http": {
+      "method": "GET",
+      "path": "/warmup",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "114.29.226.236",
+      "userAgent": "PostmanRuntime/7.36.3"
+    },
+    "requestId": "TbyqliUoBcwEPEg=",
+    "routeKey": "GET /warmup",
+    "stage": "$default",
+    "time": "20/Feb/2024:12:15:25 +0000",
+    "timeEpoch": 1708431325033
+  },
+  "isBase64Encoded": false
+}

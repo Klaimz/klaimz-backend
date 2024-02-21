@@ -16,7 +16,7 @@ public class FormField {
     @Generated
     @Id
     private String id;
-    private String type;
+    private String key;
     private String regex;
     private String defaultValue;
     private String upperRange;

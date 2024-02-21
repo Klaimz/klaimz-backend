@@ -4,6 +4,7 @@ package com.klaimz.model;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
 import lombok.*;
+import org.bson.types.ObjectId;
 
 @MappedEntity
 @Data

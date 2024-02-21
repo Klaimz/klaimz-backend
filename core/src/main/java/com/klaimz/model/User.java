@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 
 import java.util.Date;
 import java.util.List;
@@ -30,5 +31,5 @@ public class User {
     @DateCreated
     private Date createdDate;
     private boolean active;
-    private List<Role> roles;
+    private List<String> roles;
 }

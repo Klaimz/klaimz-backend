@@ -1,0 +1,92 @@
+openapi: 3.0.0
+info:
+  title: 'User Signup and Login API'
+  version: '1.0'
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /user/signup:
+    post:
+      summary: 'User Signup'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                displayName:
+                  type: string
+                  example: 'Meghdut Mandal'
+                email:
+                  type: string
+                  format: email
+                  example: 'meghdut@test.com'
+                phone:
+                  type: string
+                  example: '+9112121212'
+                roles:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 'viewer'
+                      description:
+                        type: string
+                        example: 'can only view records'
+                password:
+                  type: string
+                  example: 'test12345'
+      responses:
+        '200':
+          description: Successful signup
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+  /user/login:
+    post:
+      summary: 'User Login'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  format: email
+                  example: 'meghdut@test.com'
+                password:
+                  type: string
+                  example: 'test12345'
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    example: '65d41e483c93fa2aa4b17ff5'
+                  access_token:
+                    type: string
+                    example: 'eyJhbG2tQ'
+                  refresh_token:
+                    type: string
+                    example: 'eyJhbGpvTM'
+                  token_type:
+                    type: string
+                    example: 'Bearer'
+                  expires_in:
+                    type: integer
+                    example: 3600
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error

@@ -26,7 +26,7 @@ public class HttpUtils {
         return stringWriter.toString();
     }
     // handle exception
-    public static HttpResponse<ErrorBean> handleException(Exception e) {
+    public static HttpResponse<MessageBean> handleException(Exception e) {
         e.printStackTrace();
         return HttpResponse.serverError(ErrorBean.builder()
                 .message(e.getMessage())

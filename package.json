@@ -4,8 +4,6 @@
   },
   "dependencies": {
     "serverless": "3.31.0",
-    "serverless-cloudformation-changesets": "0.0.2",
-    "serverless-domain-manager": "^7.3.3",
-    "serverless-step-functions": "3.13.1"
+    "serverless-domain-manager": "^7.3.3"
   }
 }

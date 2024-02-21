@@ -3,6 +3,7 @@ package com.klaimz.model;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
 import lombok.*;
+import org.bson.types.ObjectId;
 
 
 @MappedEntity
@@ -21,5 +22,5 @@ public class Company {
     private String website;
     private String address;
     private String registrationNumber;
-    private User pointOfContact;
+//    private User pointOfContact;
 }

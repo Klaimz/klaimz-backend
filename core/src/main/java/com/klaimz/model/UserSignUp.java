@@ -2,7 +2,9 @@ package com.klaimz.model;
 
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class UserSignUp extends User{
 
