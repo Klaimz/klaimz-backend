@@ -101,3 +101,15 @@ functions:
         - httpApi:
             path: /claim/{id}
             method: patch
+        - httpApi:
+            path: /claim/{id}/comment
+            method: post
+        - httpApi:
+            path: /claim/{id}/status
+            method: post
+        - httpApi:
+            path: /claim/{id}/{fieldId}/upload
+            method: post
+        - httpApi:
+            path: /claim/{id}/{fieldId}/download
+            method: get

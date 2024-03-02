@@ -96,6 +96,9 @@ public class Claim {
         if (status == null || status.isBlank()) {
             throw new IllegalArgumentException("Status cannot be empty");
         }
+        if (status.equals(this.status)) {
+            throw new IllegalArgumentException("Status is already " + status);
+        }
         if (updates == null) {
             updates = new ArrayList<>();
         }
@@ -112,7 +115,6 @@ public class Claim {
         updates.add(update);
     }
 
-//    update field by key
     public void updateField(String key, String value) {
         if (fields == null) {
             fields = new ArrayList<>();
@@ -126,7 +128,6 @@ public class Claim {
         field.get().setValue(value);
     }
 
-//    get field
     public FormFieldValue getField(String key) {
         if (fields == null) {
             throw  new IllegalArgumentException("No Fields found");
