@@ -20,6 +20,8 @@ provider:
   runtime: java21
   memorySize: 700
   timeout: 800
+  httpApi:
+    cors: true
   iam:
     role:
       statements:
