@@ -5,6 +5,7 @@ import io.micronaut.data.annotation.*;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,6 +25,8 @@ public class Claim {
 
     @DateCreated
     private Date createdDate;
+
+    @Setter(AccessLevel.PRIVATE)
     private String status;
     private List<FormFieldValue> fields;
 
@@ -33,7 +36,9 @@ public class Claim {
     private String requesterCompanyId;
     private String vendorCompanyId;
 
-    private List<ClaimUpdate> updates;
+
+    @Builder.Default
+    private ArrayList<ClaimUpdate> updates = new ArrayList<>();
     private String resolutionDate;
 
     private String claimManagerId;
@@ -48,4 +53,65 @@ public class Claim {
         private String type;
         private String value;
     }
+
+
+    @Data
+    @Introspected
+    @Serdeable
+    @Getter
+    @Builder
+    public static class ClaimUpdate {
+
+        public static final String TYPE_COMMENT = "comment";
+        public static final String TYPE_STATUS = "status";
+
+        private String id;
+        private String type;
+        private String comment;
+        private String newValue;
+        private String oldValue;
+        private long  time;
+        private String user;
+    }
+
+    public void addComment(String comment,String user) {
+        if (comment == null || comment.isBlank()) {
+            throw new IllegalArgumentException("Comment cannot be empty");
+        }
+
+        if (updates == null) {
+            updates = new ArrayList<>();
+        }
+
+       var update = ClaimUpdate.builder()
+               .comment(comment)
+               .time(System.currentTimeMillis())
+               .user(user)
+                .type(ClaimUpdate.TYPE_COMMENT)
+               .build();
+       updates.add(update);
+    }
+
+    public void updateStatus(String status,String user) {
+        if (status == null || status.isBlank()) {
+            throw new IllegalArgumentException("Status cannot be empty");
+        }
+        if (updates == null) {
+            updates = new ArrayList<>();
+        }
+        var update = ClaimUpdate.builder()
+                .newValue(status)
+                .time(System.currentTimeMillis())
+                .user(user)
+                .oldValue(this.status)
+                .comment("Status updated to " + status)
+                .newValue(status)
+                .type(ClaimUpdate.TYPE_STATUS)
+                .build();
+        this.status = status;
+        updates.add(update);
+    }
+
+
+
 }

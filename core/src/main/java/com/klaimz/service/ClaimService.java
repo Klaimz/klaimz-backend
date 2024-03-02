@@ -8,8 +8,6 @@ import com.klaimz.repo.ClaimTemplateRepository;
 import io.micronaut.objectstorage.aws.AwsS3Operations;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.bson.types.ObjectId;
-import org.ietf.jgss.Oid;
 
 import java.util.List;
 import java.util.Optional;
@@ -116,5 +114,29 @@ public class ClaimService {
         validateClaim(claim);
 
         return claimRepository.update(claim);
+    }
+
+    public Claim addComment(String claimId, String comment,String user) {
+        var claim = claimRepository.findById(claimId);
+        if (claim.isEmpty()) {
+            throw new IllegalArgumentException("Claim not found");
+        }
+        var claimObj = claim.get();
+
+        claimObj.addComment(comment, user);
+
+        return claimRepository.update(claimObj);
+    }
+
+    public Object updateStatus(String id, String status,String user) {
+        var claim = claimRepository.findById(id);
+        if (claim.isEmpty()) {
+            throw new IllegalArgumentException("Claim not found");
+        }
+        var claimObj = claim.get();
+
+        claimObj.updateStatus(status, user);
+
+        return claimRepository.update(claimObj);
     }
 }

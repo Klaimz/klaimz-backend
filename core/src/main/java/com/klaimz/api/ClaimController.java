@@ -2,10 +2,10 @@ package com.klaimz.api;
 
 
 import com.klaimz.model.Claim;
+import com.klaimz.model.api.GenericDto;
 import com.klaimz.model.api.Filter;
 import com.klaimz.model.http.MessageBean;
 import com.klaimz.service.ClaimService;
-import com.klaimz.util.HttpUtils;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
@@ -13,6 +13,8 @@ import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.security.annotation.Secured;
 import jakarta.inject.Inject;
+
+import java.security.Principal;
 
 import static com.klaimz.util.HttpUtils.*;
 import static io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED;
@@ -27,11 +29,25 @@ public class ClaimController {
     @Get("/{id}")
     public HttpResponse<MessageBean> getClaimById(@NonNull String id) {
 
-        var claim =  claimService.getClaimById(id);
+        var claim = claimService.getClaimById(id);
         if (claim.isEmpty()) {
             return notFound("Claim not found");
         }
         return success(claim, "Claim found");
+    }
+
+    @Post("/{id}/comment")
+    public HttpResponse<MessageBean> addComment(@NonNull String id, @Body GenericDto comment, @NonNull Principal principal) {
+        var userId = principal.getName();
+        var claim = claimService.addComment(id, comment.getBody(), userId);
+        return success(claim, "Comment added");
+    }
+
+    @Post("/{id}/status")
+    public HttpResponse<MessageBean> updateStatus(@NonNull String id, @Body GenericDto status,@NonNull Principal principal) {
+        var userId = principal.getName();
+        var claim = claimService.updateStatus(id,status.getBody(),userId);
+        return success(claim, "Claim status updated");
     }
 
     @Post
@@ -54,7 +70,7 @@ public class ClaimController {
 
     @Get("/all")
     public HttpResponse<MessageBean> getAllClaims() {
-        var claims =  claimService.getAllClaims();
+        var claims = claimService.getAllClaims();
         if (claims.isEmpty()) {
             return notFound("No claims found");
         }
