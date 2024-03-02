@@ -8,12 +8,20 @@ import com.klaimz.model.http.MessageBean;
 import com.klaimz.service.ClaimService;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
+import io.micronaut.http.multipart.CompletedFileUpload;
+import io.micronaut.objectstorage.aws.AwsS3Operations;
+import io.micronaut.objectstorage.request.UploadRequest;
+import io.micronaut.objectstorage.response.UploadResponse;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.security.annotation.Secured;
 import jakarta.inject.Inject;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
+import java.io.File;
 import java.security.Principal;
 
 import static com.klaimz.util.HttpUtils.*;
@@ -26,13 +34,13 @@ public class ClaimController {
     @Inject
     private ClaimService claimService;
 
+    @Inject
+    private AwsS3Operations objectStorage;
+
+
     @Get("/{id}")
     public HttpResponse<MessageBean> getClaimById(@NonNull String id) {
-
         var claim = claimService.getClaimById(id);
-        if (claim.isEmpty()) {
-            return notFound("Claim not found");
-        }
         return success(claim, "Claim found");
     }
 
@@ -44,10 +52,46 @@ public class ClaimController {
     }
 
     @Post("/{id}/status")
-    public HttpResponse<MessageBean> updateStatus(@NonNull String id, @Body GenericDto status,@NonNull Principal principal) {
+    public HttpResponse<MessageBean> updateStatus(@NonNull String id, @Body GenericDto status, @NonNull Principal principal) {
         var userId = principal.getName();
-        var claim = claimService.updateStatus(id,status.getBody(),userId);
+        var claim = claimService.updateStatus(id, status.getBody(), userId);
         return success(claim, "Claim status updated");
+    }
+
+    @Post(consumes = MediaType.MULTIPART_FORM_DATA, value = "/{id}/{fieldKey}/upload")
+    public HttpResponse<MessageBean> upload(@PathVariable String fieldKey, @PathVariable String id, CompletedFileUpload file) {
+        var claim = claimService.getClaimById(id);
+
+        var field = claim.getField(fieldKey);
+
+        var fileExtension = file.getFilename().substring(file.getFilename().lastIndexOf("."));
+
+        UploadRequest objectStorageUpload = UploadRequest.fromCompletedFileUpload(file);
+        var filePath = "claim/" + id + "/" + fieldKey + "/" + System.currentTimeMillis() + fileExtension;
+        objectStorage.upload(objectStorageUpload, builder -> {
+            builder.key(filePath);
+        });
+
+        claim.updateField(fieldKey, filePath);
+        claimService.updateClaim(claim);
+
+        return success(filePath, "File uploaded successfully");
+    }
+
+    //     download file
+    @Get("/{id}/{fieldKey}/download")
+    public HttpResponse download(@PathVariable String fieldKey, @PathVariable String id) {
+        var claim = claimService.getClaimById(id);
+
+        var field = claim.getField(fieldKey);
+
+        var filePath = field.getValue();
+        var file = objectStorage.retrieve(filePath);
+        if (file.isEmpty()) {
+            return notFound("File not found");
+        }
+
+        return HttpResponse.ok(file.get().getInputStream());
     }
 
     @Post

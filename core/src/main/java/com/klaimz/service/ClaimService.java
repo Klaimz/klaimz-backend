@@ -5,7 +5,6 @@ import com.klaimz.model.Claim;
 import com.klaimz.model.api.Filter;
 import com.klaimz.repo.ClaimRepository;
 import com.klaimz.repo.ClaimTemplateRepository;
-import io.micronaut.objectstorage.aws.AwsS3Operations;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -22,15 +21,15 @@ public class ClaimService {
     private ClaimRepository claimRepository;
 
     @Inject
-    private AwsS3Operations objectStorage;
-
-
-    @Inject
     private ClaimTemplateRepository claimTemplateRepository;
 
     // get claim by id
-    public Optional<Claim> getClaimById(String id) {
-        return claimRepository.findById(id);
+    public Claim getClaimById(String id) {
+        var claim =  claimRepository.findById(id);
+        if (claim.isEmpty()) {
+            throw new IllegalArgumentException("Claim not found");
+        }
+        return claim.get();
     }
 
     // get all claims

@@ -112,6 +112,33 @@ public class Claim {
         updates.add(update);
     }
 
+//    update field by key
+    public void updateField(String key, String value) {
+        if (fields == null) {
+            fields = new ArrayList<>();
+        }
+        var field = fields.stream()
+                .filter(f -> f.getKey().equals(key))
+                .findFirst();
+        if (field.isEmpty()) {
+            throw new IllegalArgumentException("Field not found");
+        }
+        field.get().setValue(value);
+    }
 
+//    get field
+    public FormFieldValue getField(String key) {
+        if (fields == null) {
+            throw  new IllegalArgumentException("No Fields found");
+        }
+        var field = fields.stream()
+                .filter(f -> f.getKey().equals(key))
+                .findFirst();
 
+        if (field.isEmpty()) {
+            throw new IllegalArgumentException("Field not found");
+        }
+
+        return field.get();
+    }
 }
