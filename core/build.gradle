@@ -20,6 +20,7 @@ tasks.register('runLocal', JavaExec) {
     def stage = 'dev'
     def env = new HashMap<String, String>()
     env["ENV"] = stage
+    env["S3_BUCKET"] = 'klaimz-files'
 
     setEnvironment(env)
     print(configurations.getByName("localRuntime"))
@@ -54,7 +55,7 @@ dependencies {
 
     implementation("io.micronaut.security:micronaut-security-jwt")
     implementation 'io.projectreactor:reactor-core:3.6.3'
-    implementation("io.micronaut.objectstorage:micronaut-object-storage-aws")
+    implementation("software.amazon.awssdk:s3")
 
 
     annotationProcessor("io.micronaut.data:micronaut-data-document-processor")

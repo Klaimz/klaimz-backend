@@ -7,6 +7,19 @@ import java.util.List;
 
 public final class Constants {
 
+
+    public static String STATUS_NEW = "NEW_CLAIM";
+    public static String STATUS_CM_ASSIGNED = "CM_ASSIGNED";
+
+    public static String STATUS_RESOLVED = "RESOLVED";
+
+    public static String STATUS_REJECTED = "REJECTED";
+
+
+
+
+
+
     public static List<FormField> FORM_FIELDS = List.of(
             FormField.builder()
                     .key("text")

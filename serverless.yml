@@ -14,9 +14,12 @@ custom:
 params:
   dev:
     ENV: 'dev'
+    fileBucket: 'klaimz-files'
 
 provider:
   name: aws
+  environment:
+    S3_BUCKET: ${param:fileBucket}
   runtime: java21
   memorySize: 700
   timeout: 800
