@@ -80,6 +80,15 @@ public class UserService {
     }
 
     public List<User> findByField(Filter filter) {
+
+        if (filter.getField() == null || filter.getValue() == null) {
+            throw new IllegalArgumentException("Field and value must be provided");
+        }
+
+        if (filter.getField().equals("roles")) {
+            return userRepository.findByRoleIn(filter.getValue());
+        }
+
         return userRepository.findAll(UserRepository.Specification.findByField(filter.getField(), filter.getValue()));
     }
 

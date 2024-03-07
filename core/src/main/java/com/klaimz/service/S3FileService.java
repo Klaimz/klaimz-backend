@@ -1,6 +1,7 @@
 package com.klaimz.service;
 
 
+import com.klaimz.model.Claim;
 import com.klaimz.model.api.PresignedUrlDto;
 import io.micronaut.context.annotation.Value;
 import jakarta.inject.Inject;
@@ -35,18 +36,22 @@ public class S3FileService {
     public PresignedUrlDto generatePresignedPutUrl(String id, String fieldKey, String fileName) {
         var claim = claimService.getClaimById(id);
         var field = claim.getField(fieldKey);
-        var path = "claims/" + claim.getId() + "/" + field.getKey() + "/" + fileName;
+        var path = getPath(fileName, claim, field);
 
         return PresignedUrlDto.builder()
-                .path(path)
+                .fileName(fileName)
                 .url(createPresignedPutUrl(bucket, path))
                 .build();
     }
 
-    public PresignedUrlDto generatePresignedGetUrl(String id, String fieldKey) {
+    private static String getPath(String fileName, Claim claim, Claim.FormFieldValue field) {
+        return "claims/" + claim.getId() + "/" + field.getKey() + "/" + fileName;
+    }
+
+    public PresignedUrlDto generatePresignedGetUrl(String id, String fieldKey,String fileName) {
         var claim = claimService.getClaimById(id);
         var field = claim.getField(fieldKey);
-        var path = field.getValue();
+        var path = getPath(fileName, claim, field);
 
         return PresignedUrlDto.builder()
                 .url(createPresignedGetUrl(bucket, path))

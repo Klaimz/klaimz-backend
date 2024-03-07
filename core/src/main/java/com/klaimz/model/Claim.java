@@ -28,20 +28,24 @@ public class Claim {
 
     @Setter(AccessLevel.PRIVATE)
     private String status;
+
+    private List<ProductEntry> products;
     private List<FormFieldValue> fields;
 
     @DateUpdated
     private Date updateDate;
     private String requesterUserId;
-    private String requesterCompanyId;
-    private String vendorCompanyId;
+    private String evaluatorUserId;
+    private String claimManagerId;
+
+    private User requester;
+    private User evaluator;
+    private User claimManager;
 
 
     @Builder.Default
     private ArrayList<ClaimUpdate> updates = new ArrayList<>();
-    private String resolutionDate;
 
-    private String claimManagerId;
     private String claimTemplateId;
 
     @Data
@@ -52,6 +56,18 @@ public class Claim {
         private String key;
         private String type;
         private String value;
+    }
+
+    @Data
+    @Introspected
+    @Serdeable
+    @Getter
+    public static class ProductEntry{
+        private String name;
+        private String id;
+        private double mrp;
+        private double saleAmount;
+        private int quantity;
     }
 
 

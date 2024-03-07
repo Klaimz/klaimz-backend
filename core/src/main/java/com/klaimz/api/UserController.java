@@ -1,13 +1,14 @@
 package com.klaimz.api;
 
-import com.klaimz.model.User;
 import com.klaimz.model.api.Filter;
 import com.klaimz.model.http.MessageBean;
 import com.klaimz.service.UserService;
-import com.klaimz.util.HttpUtils;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.HttpResponse;
-import io.micronaut.http.annotation.*;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.security.annotation.Secured;
@@ -15,6 +16,7 @@ import jakarta.inject.Inject;
 
 import java.security.Principal;
 
+import static com.klaimz.util.HttpUtils.badRequest;
 import static com.klaimz.util.HttpUtils.success;
 import static io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED;
 
@@ -34,7 +36,7 @@ public class UserController {
         var user =  userService.getUserById(userId);
 
         if (user.isEmpty()) {
-            return HttpUtils.badRequest("Current User profile not found");
+            return badRequest("Current User profile not found");
         }
 
         return success(user, "Current User profile");
@@ -45,7 +47,7 @@ public class UserController {
         var user =  userService.getUserById(id);
 
         if (user.isEmpty()) {
-            return HttpUtils.badRequest("User not found");
+            return badRequest("User not found");
         }
 
         return success(user, "User found");
@@ -56,10 +58,9 @@ public class UserController {
         var result = userService.findByField(filter);
 
         if (result.isEmpty()) {
-            return HttpUtils.badRequest("No user found");
+            return badRequest("No user found");
         }
 
         return success(result, "User search result");
     }
-
 }

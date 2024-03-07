@@ -9,10 +9,7 @@ import com.klaimz.service.ClaimService;
 import com.klaimz.service.S3FileService;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.HttpResponse;
-import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
-import io.micronaut.http.client.StreamingHttpClient;
-import io.micronaut.http.multipart.CompletedFileUpload;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.security.annotation.Secured;
@@ -34,7 +31,6 @@ public class ClaimController {
 
     @Inject
     private S3FileService s3FileService;
-
 
 
     @Get("/{id}")
@@ -60,17 +56,32 @@ public class ClaimController {
     @Post(  "/{id}/{fieldKey}/upload")
     public HttpResponse<MessageBean> upload(@PathVariable String fieldKey, @PathVariable String id,@QueryValue("file") String fileName) {
         var claim = claimService.getClaimById(id);
+        var field = claim.getField(fieldKey);
+
+        if (field.getValue().contains(fileName)) {
+            return badRequest("File already uploaded");
+        }
+
+       // check if the file name doesn't contain any special characters
+        if (!fileName.matches("^[a-zA-Z0-9_.-]*$")) {
+            return badRequest("Invalid file name");
+        }
+
+        // generate pre-signed URL for the file upload
         var presignedUrlDto  = s3FileService.generatePresignedPutUrl(id, fieldKey, fileName);
 
-        claim.updateField(fieldKey, presignedUrlDto.getPath());
+        // update the field value with the new file name
+        var newFieldValue = field.getValue() + ";" + fileName;
+
+        claim.updateField(fieldKey, newFieldValue);
         claimService.updateClaim(claim);
 
         return success(presignedUrlDto, "Pre-signed URL generated successfully");
     }
 
     @Get("/{id}/{fieldKey}/download")
-    public HttpResponse download(@PathVariable String fieldKey, @PathVariable String id) throws URISyntaxException {
-        var presignedUrlDto = s3FileService.generatePresignedGetUrl(id, fieldKey);
+    public HttpResponse download(@PathVariable String fieldKey, @PathVariable String id,@QueryValue("file") String fileName) throws URISyntaxException {
+        var presignedUrlDto = s3FileService.generatePresignedGetUrl(id, fieldKey,fileName);
         var url = presignedUrlDto.getUrl();
 
         return HttpResponse.redirect(new URI(url));

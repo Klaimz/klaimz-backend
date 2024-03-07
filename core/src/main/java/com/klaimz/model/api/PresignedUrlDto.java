@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 public class PresignedUrlDto {
-    private String path;
+    private String fileName;
     private String url;
 }

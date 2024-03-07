@@ -1,6 +1,5 @@
 package com.klaimz.api;
 
-import com.klaimz.model.http.ErrorBean;
 import com.klaimz.model.http.MessageBean;
 import com.klaimz.util.HttpUtils;
 import io.micronaut.http.HttpRequest;
@@ -15,6 +14,7 @@ public class GlobalExceptionHandler implements ExceptionHandler<Exception, HttpR
     @Override
     public HttpResponse<MessageBean> handle(HttpRequest request, Exception exception) {
         if (exception instanceof IllegalArgumentException) {
+            // Most cases of IllegalArgumentException are from invalid data.
             return HttpUtils.badRequest(exception.getMessage());
         }
 

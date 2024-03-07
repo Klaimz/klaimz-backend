@@ -25,6 +25,11 @@ public class User {
     private String email;
     private String phone;
 
+    private String companyName;
+    private String address;
+    private String gstNumber;
+    private String region;
+
     @DateUpdated
     private Date lastLoginDate;
 
