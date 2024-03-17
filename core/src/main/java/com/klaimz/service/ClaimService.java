@@ -5,6 +5,7 @@ import com.klaimz.model.Claim;
 import com.klaimz.model.api.Filter;
 import com.klaimz.repo.ClaimRepository;
 import com.klaimz.repo.ClaimTemplateRepository;
+import com.klaimz.repo.UserRepository;
 import com.klaimz.util.EntityValidators;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -23,6 +24,9 @@ public class ClaimService {
 
     @Inject
     private ClaimTemplateRepository claimTemplateRepository;
+
+    @Inject
+    private UserRepository userRepository;
 
     // get claim by id
     public Claim getClaimById(String id) {
@@ -49,6 +53,27 @@ public class ClaimService {
         claim.setId(null); // ensure id is not set
         claim.setCreatedDate(null); // ensure created date is not set
         claim.setUpdateDate(null); // ensure update date is not set
+
+
+        var requester = userRepository.findById(claim.getRequesterUserId());
+        var evaluator = userRepository.findById(claim.getEvaluatorUserId());
+        var claimManager = userRepository.findById(claim.getClaimManagerUserId());
+
+        if (requester.isEmpty()) {
+            throw new IllegalArgumentException("Requester not found");
+        }
+
+        if (evaluator.isEmpty()) {
+            throw new IllegalArgumentException("Evaluator not found");
+        }
+
+        if (claimManager.isEmpty()) {
+            throw new IllegalArgumentException("Claim manager not found");
+        }
+
+        claim.setRequester(requester.get());
+        claim.setEvaluator(evaluator.get());
+        claim.setClaimManager(claimManager.get());
 
         return claimRepository.save(claim);
     }

@@ -35,6 +35,9 @@ public class EntityValidators {
             emptyCheck(Claim::getDescription, "Claim must have a description"),
             emptyCheck(Claim::getAmount, "Claim amount must have a value"),
             emptyCheck(Claim::getStatus, "Claim must have a status"),
+            emptyCheck(Claim::getEvaluatorUserId, "Claim must have an evaluator"),
+            emptyCheck(Claim::getClaimManagerUserId, "Claim must have a claim manager"),
+            emptyCheck(Claim::getRequesterUserId, "Claim must have a requester"),
             // claim amount must be greater than 0 and valid currency
             claim -> {
                 if (!isCurrency(claim.getAmount())) {

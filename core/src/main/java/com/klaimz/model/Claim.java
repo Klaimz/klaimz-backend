@@ -36,10 +36,12 @@ public class Claim {
     private Date updateDate;
     private String requesterUserId;
     private String evaluatorUserId;
-    private String claimManagerId;
+    private String claimManagerUserId;
 
     private User requester;
+
     private User evaluator;
+
     private User claimManager;
 
 
