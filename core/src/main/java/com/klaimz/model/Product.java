@@ -1,19 +1,23 @@
 package com.klaimz.model;
 
 
+import io.micronaut.data.annotation.GeneratedValue;
+import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@EqualsAndHashCode(callSuper = true)
 @MappedEntity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Product {
-    private String name;
+public class Product extends Claim.ProductDTO {
+
+    @Id
+    @GeneratedValue
     private String id;
-    private double mrp;
+    private String uid;
+    private String batchNumber;
+    private double gstPercentage;
 }

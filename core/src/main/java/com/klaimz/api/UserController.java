@@ -30,8 +30,6 @@ public class UserController {
 
     @Get("/me")
     public HttpResponse<MessageBean> me(@NonNull Principal principal) {
-
-        userService.getAllUsers();
         var userId = principal.getName();
         var user =  userService.getUserById(userId);
 

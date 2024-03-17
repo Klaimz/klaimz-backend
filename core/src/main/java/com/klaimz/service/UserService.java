@@ -8,10 +8,13 @@ import com.klaimz.repo.LoginRepository;
 import com.klaimz.repo.RoleRepository;
 import com.klaimz.repo.UserRepository;
 import com.klaimz.util.HashUtils;
+import io.micronaut.serde.ObjectMapper;
+import io.micronaut.serde.bson.BsonJsonMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.types.ObjectId;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
@@ -33,6 +36,9 @@ public class UserService {
     @Inject
     private RoleRepository roleRepository;
 
+    @Inject
+    private BsonJsonMapper objectMapper;
+
     List<Function<User, String>> validators = List.of(
             emptyCheck(User::getDisplayName, "User must have a display name"),
             emptyCheck(User::getEmail, "User must have an email"),
@@ -46,8 +52,7 @@ public class UserService {
             },
             user -> {
                 var roles = user.getRoles();
-
-
+//                TODO: check if roles are valid
                 return VERIFIED;
             }
     );
@@ -122,3 +127,17 @@ public class UserService {
        all.forEach(System.out::println);
     }
 }
+/*
+
+QueriesTable: ID, Query, Description
+Metrics: ID, QueryID, MetricName, MetricValue
+
+
+ March 2024
+ Cloudwatch - Feb 2023
+
+
+---- Setup a local splunk
+
+
+ */

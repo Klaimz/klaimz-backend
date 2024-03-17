@@ -90,6 +90,9 @@ functions:
             path: /user/me
             method: get
         - httpApi:
+            path: /user/search
+            method: post
+        - httpApi:
             path: /warmup
             method: get
         - httpApi:
@@ -111,8 +114,20 @@ functions:
             path: /claim/{id}/status
             method: post
         - httpApi:
+            path: /claim/search
+            method: post
+        - httpApi:
             path: /claim/{id}/{fieldId}/upload
             method: post
         - httpApi:
             path: /claim/{id}/{fieldId}/download
             method: get
+        - httpApi:
+            path: /product/{id}
+            method: get
+        - httpApi:
+            path: /product/all
+            method: get
+        - httpApi:
+            path: /product
+            method: post

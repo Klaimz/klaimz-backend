@@ -29,7 +29,7 @@ public class Claim {
     @Setter(AccessLevel.PRIVATE)
     private String status;
 
-    private List<ProductEntry> products;
+    private List<ProductDTO> products;
     private List<FormFieldValue> fields;
 
     @DateUpdated
@@ -62,9 +62,8 @@ public class Claim {
     @Introspected
     @Serdeable
     @Getter
-    public static class ProductEntry{
+    public static class ProductDTO {
         private String name;
-        private String id;
         private double mrp;
         private double saleAmount;
         private int quantity;

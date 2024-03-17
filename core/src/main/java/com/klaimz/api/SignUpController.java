@@ -14,6 +14,7 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import jakarta.inject.Inject;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 import static com.klaimz.util.HttpUtils.success;
@@ -29,9 +30,8 @@ public class SignUpController {
     private UserService userService;
 
     @Post
-    public HttpResponse<MessageBean> registerUser(@Body UserSignUp userSignUp) throws NoSuchAlgorithmException {
+    public HttpResponse<MessageBean> registerUser(@Body UserSignUp userSignUp) throws NoSuchAlgorithmException, IOException {
         var user = userService.createUser(userSignUp);
-
         if (user == null) {
             return HttpUtils.badRequest("Unable to signup user");
         }

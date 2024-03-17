@@ -1,24 +1,29 @@
 package com.klaimz.model;
 
 
+import io.micronaut.serde.ObjectMapper;
+import jakarta.inject.Inject;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.IOException;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class UserSignUp extends User{
-
+public class UserSignUp extends User {
     private String password;
 
     public User convertToUser() {
         return User.builder()
-                .displayName(this.getDisplayName())
-                .email(this.getEmail())
-                .phone(this.getPhone())
-                .roles(this.getRoles())
+                .displayName(getDisplayName())
+                .email(getEmail())
+                .phone(getPhone())
+                .companyName(getCompanyName())
+                .address(getAddress())
+                .gstNumber(getGstNumber())
+                .region(getRegion())
                 .active(true)
-                .lastLoginDate(null)
-                .id(null)
+                .roles(getRoles())
                 .build();
     }
 }

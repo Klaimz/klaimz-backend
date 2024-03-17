@@ -2,10 +2,14 @@ package com.klaimz.repo;
 
 
 import com.klaimz.model.Claim;
+import io.micronaut.data.mongodb.annotation.MongoFilter;
+import io.micronaut.data.mongodb.annotation.MongoFindQuery;
 import io.micronaut.data.mongodb.annotation.MongoRepository;
 import io.micronaut.data.repository.CrudRepository;
 import io.micronaut.data.repository.jpa.JpaSpecificationExecutor;
 import io.micronaut.data.repository.jpa.criteria.PredicateSpecification;
+
+import java.util.List;
 
 @MongoRepository
 public interface ClaimRepository extends CrudRepository<Claim, String>, JpaSpecificationExecutor<Claim> {
