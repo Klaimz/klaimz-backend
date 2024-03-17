@@ -5,14 +5,20 @@ import java.util.function.Function;
 public final class StringUtils {
     public static String VERIFIED = "verified";
 
-    public static  <T> Function<T, String> emptyCheck(Function<T, String> generator, String message) {
+    public static  <T> Function<T, String> emptyCheck(Function<T, String> generator, String message, Function<T,Boolean> shouldCheck) {
         return user -> {
-            var value = generator.apply(user);
-            if (value == null || value.isBlank()) {
-                return message;
+            if (shouldCheck.apply(user)) {
+                var value = generator.apply(user);
+                if (value == null || value.isBlank()) {
+                    return message;
+                }
             }
             return VERIFIED;
         };
+    }
+
+    public static  <T> Function<T, String> emptyCheck(Function<T, String> generator, String message) {
+        return emptyCheck(generator, message, user -> true);
     }
 
     // check if string is currency

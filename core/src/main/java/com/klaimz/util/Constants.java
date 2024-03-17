@@ -11,6 +11,8 @@ public final class Constants {
     public static String STATUS_NEW = "NEW_CLAIM";
     public static String STATUS_CM_ASSIGNED = "CM_ASSIGNED";
 
+    public static String STATUS_EVALUATOR_ASSIGNED = "EVALUATOR_ASSIGNED";
+
     public static String STATUS_RESOLVED = "RESOLVED";
 
     public static String STATUS_REJECTED = "REJECTED";

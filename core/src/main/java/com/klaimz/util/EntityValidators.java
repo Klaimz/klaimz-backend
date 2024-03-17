@@ -7,10 +7,14 @@ import jakarta.inject.Singleton;
 import java.util.List;
 import java.util.function.Function;
 
+import static com.klaimz.util.Constants.STATUS_CM_ASSIGNED;
+import static com.klaimz.util.Constants.STATUS_EVALUATOR_ASSIGNED;
 import static com.klaimz.util.StringUtils.*;
 
 @Singleton
 public class EntityValidators {
+
+
 
     public List<Function<Product, String>> PRODUCT_VALIDATORS = List.of(
             emptyCheck(Product::getUid, "Product must have a UID"),
@@ -35,9 +39,9 @@ public class EntityValidators {
             emptyCheck(Claim::getDescription, "Claim must have a description"),
             emptyCheck(Claim::getAmount, "Claim amount must have a value"),
             emptyCheck(Claim::getStatus, "Claim must have a status"),
-            emptyCheck(Claim::getEvaluatorUserId, "Claim must have an evaluator"),
-            emptyCheck(Claim::getClaimManagerUserId, "Claim must have a claim manager"),
             emptyCheck(Claim::getRequesterUserId, "Claim must have a requester"),
+            emptyCheck(Claim::getClaimManagerUserId, "Claim must have an evaluator",claim -> claim.getStatus().equals(STATUS_CM_ASSIGNED)),
+            emptyCheck(Claim::getEvaluatorUserId, "Claim must have a claim manager",claim -> claim.getStatus().equals(STATUS_EVALUATOR_ASSIGNED)),
             // claim amount must be greater than 0 and valid currency
             claim -> {
                 if (!isCurrency(claim.getAmount())) {
