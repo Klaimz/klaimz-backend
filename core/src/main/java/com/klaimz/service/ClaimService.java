@@ -28,7 +28,6 @@ public class ClaimService {
     @Inject
     private UserRepository userRepository;
 
-    // get claim by id
     public Claim getClaimById(String id) {
         var claim = claimRepository.findById(id);
         if (claim.isEmpty()) {
@@ -37,7 +36,6 @@ public class ClaimService {
         return claim.get();
     }
 
-    // get all claims
     public List<Claim> getAllClaims() {
         return claimRepository.findAll();
     }
