@@ -8,8 +8,14 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Produces;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
+
+import static io.micronaut.security.rules.SecurityRule.IS_ANONYMOUS;
+import static io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED;
 
 @Controller("/warmup")
+@Secured(SecurityRule.IS_ANONYMOUS)
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @ExecuteOn(TaskExecutors.BLOCKING)

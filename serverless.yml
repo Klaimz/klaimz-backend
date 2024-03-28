@@ -24,7 +24,12 @@ provider:
   memorySize: 700
   timeout: 800
   httpApi:
-    cors: true
+    cors:
+      allowCredentials: false
+      allowedOrigins:
+        - '*'
+      allowedHeaders:
+        - '*'
   iam:
     role:
       statements:
