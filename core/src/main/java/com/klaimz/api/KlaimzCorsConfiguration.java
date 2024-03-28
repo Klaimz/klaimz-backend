@@ -1,6 +1,7 @@
 package com.klaimz.api;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
+import io.micronaut.context.annotation.Primary;
 import io.micronaut.http.HttpMethod;
 import io.micronaut.http.server.HttpServerConfiguration;
 import io.micronaut.http.server.cors.CorsOriginConfiguration;
@@ -8,12 +9,14 @@ import io.micronaut.http.server.cors.CorsOriginConfiguration;
 import java.util.List;
 import java.util.Map;
 
+@Primary
 @ConfigurationProperties("micronaut.server.cors")
 public class KlaimzCorsConfiguration extends HttpServerConfiguration.CorsConfiguration {
     public KlaimzCorsConfiguration() {
         super();
         this.setEnabled(true);
         this.setLocalhostPassThrough(true);
+        System.out.println("Cors configuration enabled");
     }
     @Override
     public Map<String, CorsOriginConfiguration> getConfigurations() {
