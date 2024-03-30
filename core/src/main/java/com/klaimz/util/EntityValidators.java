@@ -36,7 +36,6 @@ public class EntityValidators {
 
 
     private List<Function<Claim, String>> CLAIM_VALIDATORS = List.of(
-            emptyCheck(Claim::getDescription, "Claim must have a description"),
             emptyCheck(Claim::getAmount, "Claim amount must have a value"),
             emptyCheck(Claim::getStatus, "Claim must have a status"),
             emptyCheck(Claim::getRequesterUserId, "Claim must have a requester"),

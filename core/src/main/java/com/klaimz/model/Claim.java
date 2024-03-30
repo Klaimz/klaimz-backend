@@ -20,7 +20,6 @@ public class Claim {
     @Id
     @GeneratedValue
     private String id;
-    private String description;
     private String amount;
 
     @DateCreated
@@ -67,7 +66,7 @@ public class Claim {
     public static class ProductDTO {
         private String name;
         private double mrp;
-        private double saleAmount;
+        private String description;
         private int quantity;
     }
 
