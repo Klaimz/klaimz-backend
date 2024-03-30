@@ -54,6 +54,12 @@ public class ClaimService {
         claim.setEvaluatorUserId(null); // ensure evaluator is not set
         claim.setClaimManagerUserId(null); // ensure claim manager is not set
 
+        claim.getFields().forEach(field -> {
+            if (field.getValue() == null) {
+                field.setValue("");
+            }
+        });
+
 
         var requester = userRepository.findById(claim.getRequesterUserId());
 
@@ -69,6 +75,20 @@ public class ClaimService {
 
     public Claim updateClaim(Claim claim) {
         entityValidators.validateClaim(claim);
+
+        claim.getFields().forEach(field -> {
+            if (field.getValue() == null) {
+                field.setValue("");
+            }
+        });
+
+        if (claim.getRequesterUserId() != null) {
+            var requester = userRepository.findById(claim.getRequesterUserId());
+            if (requester.isEmpty()) {
+                throw new IllegalArgumentException("Requester not found");
+            }
+            claim.setRequester(requester.get());
+        }
 
         if (claim.getEvaluatorUserId() != null) {
             var evaluator = userRepository.findById(claim.getEvaluatorUserId());

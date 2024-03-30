@@ -71,7 +71,7 @@ public class ClaimController {
         var presignedUrlDto  = s3FileService.generatePresignedPutUrl(id, fieldKey, fileName);
 
         // update the field value with the new file name
-        var newFieldValue = field.getValue() + ";" + fileName;
+        var newFieldValue = field.getValue().isEmpty()? fileName : field.getValue() + ";" + fileName;
 
         claim.updateField(fieldKey, newFieldValue);
         claimService.updateClaim(claim);

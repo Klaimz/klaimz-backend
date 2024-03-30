@@ -16,7 +16,6 @@ public class KlaimzCorsConfiguration extends HttpServerConfiguration.CorsConfigu
         super();
         this.setEnabled(true);
         this.setLocalhostPassThrough(true);
-        System.out.println("Cors configuration enabled");
     }
     @Override
     public Map<String, CorsOriginConfiguration> getConfigurations() {

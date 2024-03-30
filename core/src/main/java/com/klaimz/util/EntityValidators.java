@@ -19,7 +19,6 @@ public class EntityValidators {
     public List<Function<Product, String>> PRODUCT_VALIDATORS = List.of(
             emptyCheck(Product::getUid, "Product must have a UID"),
             emptyCheck(Product::getName, "Product must have a name"),
-            emptyCheck(Product::getBatchNumber, "Product must have a batch number"),
             product -> {
                 if (product.getGstPercentage() < 0 || product.getGstPercentage() > 100) {
                     return "Product GST percentage must be between 0 and 100";

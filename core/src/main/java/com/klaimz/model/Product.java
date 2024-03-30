@@ -18,6 +18,5 @@ public class Product extends Claim.ProductDTO {
     @GeneratedValue
     private String id;
     private String uid;
-    private String batchNumber;
     private double gstPercentage;
 }

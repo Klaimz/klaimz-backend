@@ -21,6 +21,7 @@ tasks.register('runLocal', JavaExec) {
     def env = new HashMap<String, String>()
     env["ENV"] = stage
     env["S3_BUCKET"] = 'klaimz-files'
+    env["MONGODB_URI"] = System.getenv('MONGODB_URI')
 
     setEnvironment(env)
     print(configurations.getByName("localRuntime"))

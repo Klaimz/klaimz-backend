@@ -12,6 +12,9 @@ custom:
         - schedule: 'rate(2 minutes)'
 
 params:
+  ramvey:
+    ENV: 'ramvey'
+    fileBucket: 'klaimz-files-ramvey'
   dev:
     ENV: 'dev'
     fileBucket: 'klaimz-files'
@@ -23,6 +26,8 @@ provider:
   runtime: java21
   memorySize: 700
   timeout: 800
+  deploymentBucket:
+    name: klaimz-serverlessdeploymentbucket
   httpApi:
     cors:
       allowCredentials: false

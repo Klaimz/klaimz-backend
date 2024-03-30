@@ -10,5 +10,4 @@ import java.util.List;
 @MongoRepository
 public interface ProductRepository extends CrudRepository<Product, String> {
     List<Product> findByUid(String uid);
-    List<Product> findByBatchNumber(String batchNumber);
 }

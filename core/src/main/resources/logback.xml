@@ -12,18 +12,18 @@
         <appender-ref ref="STDOUT" />
     </root>
 
-<!--    logging for reflections -->
-    <logger name="io.micronaut.context" level="warn" />
-    <logger name="io.micronaut.core.reflect" level="warn" />
-    <logger name="io.micronaut.core.beans" level="warn" />
+<!--&lt;!&ndash;    logging for reflections &ndash;&gt;-->
+<!--    <logger name="io.micronaut.context" level="warn" />-->
+<!--    <logger name="io.micronaut.core.reflect" level="warn" />-->
+<!--    <logger name="io.micronaut.core.beans" level="warn" />-->
 
-    <logger name="io.micronaut.web.router" level="warn" />
-    <logger name="io.micronaut.aop.chain" level="warn" />
+<!--    <logger name="io.micronaut.web.router" level="warn" />-->
+<!--    <logger name="io.micronaut.aop.chain" level="warn" />-->
 
     <!--    logging for http client -->
 <!--    <logger name="io.micronaut.http.client" level="trace" />-->
 
-    <logger name="io.micronaut" level="debug" />
+<!--    <logger name="io.micronaut" level="trace" />-->
 
 <!--    <logger name="io.micronaut.data" level="trace" />-->
 </configuration>
