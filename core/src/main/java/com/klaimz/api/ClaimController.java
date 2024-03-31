@@ -50,6 +50,8 @@ public class ClaimController {
     @Post("/{id}/status")
     public HttpResponse<MessageBean> updateStatus(@NonNull String id, @Body GenericDto status, @NonNull Principal principal) {
         var userId = principal.getName();
+
+
         var claim = claimService.updateStatus(id, status.getBody(), userId);
         return success(claim, "Claim status updated");
     }
@@ -75,7 +77,7 @@ public class ClaimController {
         var newFieldValue = field.getValue().isEmpty()? fileName : field.getValue() + ";" + fileName;
 
         claim.updateField(fieldKey, newFieldValue);
-        claimService.updateClaim(claim);
+        claimService.updateClaim(claim,true);
 
         return success(presignedUrlDto, "Pre-signed URL generated successfully");
     }
@@ -101,7 +103,7 @@ public class ClaimController {
             return badRequest("Claim id mismatch");
         }
 
-        var updatedClaim = claimService.updateClaim(claim);
+        var updatedClaim = claimService.updateClaim(claim,true);
         return success(updatedClaim, "Claim updated successfully");
     }
 

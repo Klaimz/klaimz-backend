@@ -103,7 +103,14 @@ public class EntityValidators {
                 }
 
                 return VERIFIED;
-            });
+            },
+            claim -> {
+                if (!Constants.STATUS_LIST.contains(claim.getStatus())) {
+                    return "Claim status is invalid";
+                }
+                return VERIFIED;
+            }
+    );
 
     //    check if valid user id
     public <T> String validateUserId(Function<T, String> emptyCheck, String userId) {

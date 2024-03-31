@@ -7,15 +7,20 @@ import java.util.List;
 
 public final class Constants {
 
+//New→ CM Assigned → Evaluator Assigned → Evaluation in Progress → Claim Approval in Progress → Approved/Denied
+    public static String STATUS_NEW = "New";
+    public static String STATUS_CM_ASSIGNED = "CM Assigned";
 
-    public static String STATUS_NEW = "NEW_CLAIM";
-    public static String STATUS_CM_ASSIGNED = "CM_ASSIGNED";
+    public static String STATUS_EVALUATOR_ASSIGNED = "Evaluator Assigned";
 
-    public static String STATUS_EVALUATOR_ASSIGNED = "EVALUATOR_ASSIGNED";
+    public static String STATUS_EVALUATION_IN_PROGRESS = "Evaluation in Progress";
 
-    public static String STATUS_RESOLVED = "RESOLVED";
+    public static String STATUS_APPROVAL_IN_PROGRESS = "Claim Approval in Progress";
 
-    public static String STATUS_REJECTED = "REJECTED";
+    public static String STATUS_DENIED = "Denied";
+    public static String STATUS_APPROVED = "Approved";
+
+    public static List<String> STATUS_LIST = List.of(STATUS_NEW, STATUS_CM_ASSIGNED, STATUS_EVALUATOR_ASSIGNED, STATUS_EVALUATION_IN_PROGRESS, STATUS_APPROVAL_IN_PROGRESS, STATUS_DENIED, STATUS_APPROVED);
 
 
 

@@ -5,6 +5,7 @@ import com.klaimz.model.Claim;
 import com.klaimz.model.ClaimType;
 import com.klaimz.model.api.Filter;
 import com.klaimz.repo.*;
+import com.klaimz.util.Constants;
 import com.klaimz.util.EntityValidators;
 import io.micronaut.core.annotation.NonNull;
 import jakarta.inject.Inject;
@@ -54,6 +55,7 @@ public class ClaimService {
     public Claim createClaim(Claim claim, String requesterId) {
 
         claim.setRequesterUserId(requesterId);
+        claim.setStatus(Constants.STATUS_NEW);
         entityValidators.validateClaim(claim);
 
         claim.setId(null); // ensure id is not set
@@ -62,11 +64,11 @@ public class ClaimService {
         claim.setEvaluatorUserId(null); // ensure evaluator is not set
         claim.setClaimManagerUserId(null); // ensure claim manager is not set
 
-        return updateClaim(claim);
+        return updateClaim(claim, false);
     }
 
 
-    public Claim updateClaim(Claim claim) {
+    public Claim updateClaim(Claim claim, boolean update) {
         entityValidators.validateClaim(claim);
 
         claim.getFields().forEach(field -> {
@@ -115,7 +117,11 @@ public class ClaimService {
             claim.setClaimManager(claimManager.get());
         }
 
-        return claimRepository.save(claim);
+        if (update) {
+            return claimRepository.update(claim);
+        } else {
+            return claimRepository.save(claim);
+        }
     }
 
     public Claim addComment(String claimId, String comment, String user) {

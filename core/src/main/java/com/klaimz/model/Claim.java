@@ -25,7 +25,6 @@ public class Claim {
     @DateCreated
     private Date createdDate;
 
-    @Setter(AccessLevel.PRIVATE)
     private String status;
 
     private List<ProductDTO> products;
