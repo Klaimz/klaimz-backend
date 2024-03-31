@@ -2,12 +2,11 @@ package com.klaimz.service;
 
 
 import com.klaimz.model.Claim;
+import com.klaimz.model.ClaimType;
 import com.klaimz.model.api.Filter;
-import com.klaimz.repo.ClaimRepository;
-import com.klaimz.repo.ClaimTemplateRepository;
-import com.klaimz.repo.ProductRepository;
-import com.klaimz.repo.UserRepository;
+import com.klaimz.repo.*;
 import com.klaimz.util.EntityValidators;
+import io.micronaut.core.annotation.NonNull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -29,7 +28,11 @@ public class ClaimService {
     private ClaimTemplateRepository claimTemplateRepository;
 
     @Inject
+    private ClaimTypeRepository claimTypeRepository;
+
+    @Inject
     private UserRepository userRepository;
+
 
     public Claim getClaimById(String id) {
         var claim = claimRepository.findById(id);
@@ -138,4 +141,13 @@ public class ClaimService {
 
         return claimRepository.update(claimObj);
     }
+
+    public ClaimType createClaimType(ClaimType claimType) {
+        return claimTypeRepository.save(claimType);
+    }
+
+    public List<ClaimType> getAllClaimTypes() {
+        return claimTypeRepository.findAll();
+    }
+
 }

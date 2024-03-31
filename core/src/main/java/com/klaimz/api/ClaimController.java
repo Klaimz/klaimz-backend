@@ -2,6 +2,7 @@ package com.klaimz.api;
 
 
 import com.klaimz.model.Claim;
+import com.klaimz.model.ClaimType;
 import com.klaimz.model.api.Filter;
 import com.klaimz.model.api.GenericDto;
 import com.klaimz.model.http.MessageBean;
@@ -122,5 +123,22 @@ public class ClaimController {
         }
 
         return success(result, "Claim search result");
+    }
+
+    @Get("/types")
+    public HttpResponse<MessageBean> getClaimTypes() {
+        var claimTypes = claimService.getAllClaimTypes();
+
+        if (claimTypes.isEmpty()) {
+            return notFound("No claim types found");
+        }
+
+        return success(claimTypes, "Claim types found");
+    }
+
+    @Post("/types")
+    public HttpResponse<MessageBean> createClaimType(@Body ClaimType claimType) {
+        var newClaimType = claimService.createClaimType(claimType);
+        return success(newClaimType, "Claim type created successfully");
     }
 }
