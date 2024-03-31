@@ -44,3 +44,4 @@ bin/
 /.warmup/
 /node_modules/
 /.serverless/
+./.env.*

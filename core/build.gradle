@@ -17,14 +17,16 @@ configurations {
 }
 
 tasks.register('runLocal', JavaExec) {
-    def stage = 'dev'
+    def stage =  System.getenv("STAGE") ?: "local"
     def env = new HashMap<String, String>()
-    env["ENV"] = stage
-    env["S3_BUCKET"] = 'klaimz-files'
-    env["MONGODB_URI"] = System.getenv('MONGODB_URI')
+    def envFile = file("../.env."+stage)
+    def properties = new Properties()
+    properties.load(envFile.newDataInputStream())
+
+    properties.forEach { k, v -> env.put(k.toString(), v.toString()) }
 
     setEnvironment(env)
-    print(configurations.getByName("localRuntime"))
+    print("Running with env: $env")
     classpath = configurations.getByName("localRuntime") + sourceSets.main.runtimeClasspath
     mainClass = "com.klaimz.Application"
     args("--micronaut.runtime=netty")

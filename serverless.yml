@@ -1,28 +1,18 @@
 service: klaimz
 frameworkVersion: '3'
-
-
-custom:
-  warmup:
-    default:
-      enabled: false
-      memorySize: 128
-      name: warmer-default
-      events:
-        - schedule: 'rate(2 minutes)'
+useDotenv: true
 
 params:
   ramvey:
     ENV: 'ramvey'
-    fileBucket: 'klaimz-files-ramvey'
   dev:
     ENV: 'dev'
-    fileBucket: 'klaimz-files'
 
 provider:
   name: aws
   environment:
-    S3_BUCKET: ${param:fileBucket}
+    S3_FILE_BUCKET: ${env:S3_FILE_BUCKET}
+    MONGODB_URI: ${env:MONGODB_URI}
   runtime: java21
   memorySize: 700
   timeout: 800

@@ -64,10 +64,15 @@ public class Claim {
     @Serdeable
     @Getter
     public static class ProductDTO {
-        private String name;
-        private double mrp;
+        private String id;
         private String description;
         private int quantity;
+
+//        auto fetch field values from product table
+        private double mrp;
+        private String name;
+        private String uid;
+        private double gstPercentage;
     }
 
 

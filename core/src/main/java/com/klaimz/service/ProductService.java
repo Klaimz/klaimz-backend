@@ -20,7 +20,6 @@ public class ProductService {
 
 
     public Product createProduct(Product product) {
-//        generate UID for product id
         entityValidators.validateProduct(product);
         return productRepository.save(product);
     }

@@ -19,8 +19,7 @@ import java.time.Duration;
 @Singleton
 public class S3FileService {
 
-
-    @Value("${S3_BUCKET}")
+    @Value("${S3_FILE_BUCKET}")
     private String bucket;
 
     @Inject

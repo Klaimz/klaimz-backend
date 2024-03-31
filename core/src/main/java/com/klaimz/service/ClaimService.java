@@ -5,6 +5,7 @@ import com.klaimz.model.Claim;
 import com.klaimz.model.api.Filter;
 import com.klaimz.repo.ClaimRepository;
 import com.klaimz.repo.ClaimTemplateRepository;
+import com.klaimz.repo.ProductRepository;
 import com.klaimz.repo.UserRepository;
 import com.klaimz.util.EntityValidators;
 import jakarta.inject.Inject;
@@ -18,6 +19,8 @@ public class ClaimService {
     @Inject
     private ClaimRepository claimRepository;
 
+    @Inject
+    private ProductRepository productRepository;
 
     @Inject
     private EntityValidators entityValidators;
@@ -54,22 +57,7 @@ public class ClaimService {
         claim.setEvaluatorUserId(null); // ensure evaluator is not set
         claim.setClaimManagerUserId(null); // ensure claim manager is not set
 
-        claim.getFields().forEach(field -> {
-            if (field.getValue() == null) {
-                field.setValue("");
-            }
-        });
-
-
-        var requester = userRepository.findById(claim.getRequesterUserId());
-
-        if (requester.isEmpty()) {
-            throw new IllegalArgumentException("Requester not found");
-        }
-
-        claim.setRequester(requester.get());
-
-        return claimRepository.save(claim);
+        return updateClaim(claim);
     }
 
 
@@ -80,6 +68,22 @@ public class ClaimService {
             if (field.getValue() == null) {
                 field.setValue("");
             }
+        });
+
+//        set product values form the product repository
+        claim.getProducts().forEach(productDTO -> {
+            var productObj = productRepository.findById(productDTO.getId());
+            if (productObj.isEmpty()) {
+                //  cant happen technically
+                throw new IllegalArgumentException("Product not found");
+            }
+
+            productObj.ifPresent(product -> {
+                productDTO.setMrp(product.getMrp());
+                productDTO.setName(product.getName());
+                productDTO.setUid(product.getUid());
+                productDTO.setGstPercentage(product.getGstPercentage());
+            });
         });
 
         if (claim.getRequesterUserId() != null) {
@@ -106,7 +110,7 @@ public class ClaimService {
             claim.setClaimManager(claimManager.get());
         }
 
-        return claimRepository.update(claim);
+        return claimRepository.save(claim);
     }
 
     public Claim addComment(String claimId, String comment, String user) {

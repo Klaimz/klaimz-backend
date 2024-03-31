@@ -2,9 +2,12 @@ package com.klaimz.util;
 
 import com.klaimz.model.Claim;
 import com.klaimz.model.Product;
+import com.klaimz.repo.ProductRepository;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static com.klaimz.util.Constants.STATUS_CM_ASSIGNED;
@@ -14,9 +17,10 @@ import static com.klaimz.util.StringUtils.*;
 @Singleton
 public class EntityValidators {
 
+    @Inject
+    private ProductRepository productRepository;
 
-
-    public List<Function<Product, String>> PRODUCT_VALIDATORS = List.of(
+    public final List<Function<Product, String>> PRODUCT_VALIDATORS = List.of(
             emptyCheck(Product::getUid, "Product must have a UID"),
             emptyCheck(Product::getName, "Product must have a name"),
             product -> {
@@ -26,15 +30,15 @@ public class EntityValidators {
                 return VERIFIED;
             },
             product -> {
-                if (product.getQuantity() < 0) {
-                    return "Product quantity must be greater than 0";
+                if (product.getMrp() > 0) {
+                    return "Product mrp must be greater than 0";
                 }
                 return VERIFIED;
             }
     );
 
 
-    private List<Function<Claim, String>> CLAIM_VALIDATORS = List.of(
+    private final List<Function<Claim, String>> CLAIM_VALIDATORS = List.of(
             emptyCheck(Claim::getAmount, "Claim amount must have a value"),
             emptyCheck(Claim::getStatus, "Claim must have a status"),
             emptyCheck(Claim::getRequesterUserId, "Claim must have a requester"),
@@ -75,12 +79,27 @@ public class EntityValidators {
                 if (claim.getClaimTemplateId() == null || claim.getClaimTemplateId().isBlank()) {
                     return "Claim must not have a empty template id";
                 }
-//                TODO: check if claim template exists
-//                claimTemplateRepository.findAll();
-//                var template = claimTemplateRepository.findById(claim.getClaimTemplateId());
-//                if (template.isEmpty()) {
-//                    return "Claim template not found";
-//                }
+                // TODO: check if claim template exists
+                // claimTemplateRepository.findAll();
+                // var template = claimTemplateRepository.findById(claim.getClaimTemplateId());
+                // if (template.isEmpty()) {
+                //     return "Claim template not found";
+                // }
+                return VERIFIED;
+            },
+            claim -> {
+                if (claim.getProducts() == null || claim.getProducts().isEmpty()) {
+                    return "Claim must have products";
+                }
+
+                //  check if all products exist
+                var isAllProductsValid = claim.getProducts().stream().map(Claim.ProductDTO::getId)
+                        .map(productRepository::findById)
+                        .noneMatch(Optional::isEmpty);
+                if (!isAllProductsValid) {
+                    return "Claim must have valid products,check the product ids";
+                }
+
                 return VERIFIED;
             }
     );
