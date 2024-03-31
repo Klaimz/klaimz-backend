@@ -3,6 +3,7 @@ package com.klaimz.util;
 import com.klaimz.model.Claim;
 import com.klaimz.model.Product;
 import com.klaimz.repo.ProductRepository;
+import com.klaimz.repo.UserRepository;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -19,6 +20,9 @@ public class EntityValidators {
 
     @Inject
     private ProductRepository productRepository;
+
+    @Inject
+    private UserRepository userRepository;
 
     public final List<Function<Product, String>> PRODUCT_VALIDATORS = List.of(
             emptyCheck(Product::getUid, "Product must have a UID"),
@@ -42,8 +46,8 @@ public class EntityValidators {
             emptyCheck(Claim::getAmount, "Claim amount must have a value"),
             emptyCheck(Claim::getStatus, "Claim must have a status"),
             emptyCheck(Claim::getRequesterUserId, "Claim must have a requester"),
-            emptyCheck(Claim::getClaimManagerUserId, "Claim must have an evaluator",claim -> claim.getStatus().equals(STATUS_CM_ASSIGNED)),
-            emptyCheck(Claim::getEvaluatorUserId, "Claim must have a claim manager",claim -> claim.getStatus().equals(STATUS_EVALUATOR_ASSIGNED)),
+            emptyCheck(Claim::getClaimManagerUserId, "Claim must have an evaluator", claim -> claim.getStatus().equals(STATUS_CM_ASSIGNED)),
+            emptyCheck(Claim::getEvaluatorUserId, "Claim must have a claim manager", claim -> claim.getStatus().equals(STATUS_EVALUATOR_ASSIGNED)),
             // claim amount must be greater than 0 and valid currency
             claim -> {
                 if (!isCurrency(claim.getAmount())) {
@@ -72,8 +76,6 @@ public class EntityValidators {
                     return typeFun.apply(field);
                 }).filter(result -> !result.equals(VERIFIED)).findFirst().orElse(VERIFIED);
             },
-            //            claim must have a requester
-            emptyCheck(Claim::getRequesterUserId, "Claim must have a requester"),
             //            must have a claim template id
             claim -> {
                 if (claim.getClaimTemplateId() == null || claim.getClaimTemplateId().isBlank()) {
@@ -101,8 +103,19 @@ public class EntityValidators {
                 }
 
                 return VERIFIED;
-            }
-    );
+            });
+
+    //    check if valid user id
+    public <T> String validateUserId(Function<T, String> emptyCheck, String userId) {
+        var result = emptyCheck(userId, "User id cannot be empty");
+        if (!result.equals(VERIFIED)) {
+            throw new IllegalArgumentException(result);
+        }
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
+        return VERIFIED;
+    }
 
 
     public void validateClaim(Claim claim) {

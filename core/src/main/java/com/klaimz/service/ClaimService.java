@@ -48,7 +48,9 @@ public class ClaimService {
     }
 
 
-    public Claim createClaim(Claim claim) {
+    public Claim createClaim(Claim claim, String requesterId) {
+
+        claim.setRequesterUserId(requesterId);
         entityValidators.validateClaim(claim);
 
         claim.setId(null); // ensure id is not set

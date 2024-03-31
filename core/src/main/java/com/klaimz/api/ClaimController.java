@@ -88,8 +88,8 @@ public class ClaimController {
     }
 
     @Post
-    public HttpResponse<MessageBean> createClaim(@Body Claim claim) {
-        var newClaim = claimService.createClaim(claim);
+    public HttpResponse<MessageBean> createClaim(@Body Claim claim, @NonNull Principal principal) {
+        var newClaim = claimService.createClaim(claim,principal.getName());
         return success(newClaim, "Claim created successfully");
     }
 
