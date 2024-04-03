@@ -89,6 +89,7 @@ public class ClaimService {
                 productDTO.setMrp(product.getMrp());
                 productDTO.setName(product.getName());
                 productDTO.setUid(product.getUid());
+                productDTO.setId(product.getId());
                 productDTO.setGstPercentage(product.getGstPercentage());
             });
         });

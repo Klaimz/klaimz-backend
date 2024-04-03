@@ -117,6 +117,12 @@ functions:
             path: /claim/search
             method: post
         - httpApi:
+            path: /claim/types
+            method: post
+        - httpApi:
+            path: /claim/types
+            method: get
+        - httpApi:
             path: /claim/{id}/{fieldId}/upload
             method: post
         - httpApi:

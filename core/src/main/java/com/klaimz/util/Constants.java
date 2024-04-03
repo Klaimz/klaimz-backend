@@ -9,7 +9,7 @@ public final class Constants {
 
 //New→ CM Assigned → Evaluator Assigned → Evaluation in Progress → Claim Approval in Progress → Approved/Denied
     public static String STATUS_NEW = "New";
-    public static String STATUS_CM_ASSIGNED = "CM Assigned";
+    public static String STATUS_CM_ASSIGNED = "Claim Manager Assigned";
 
     public static String STATUS_EVALUATOR_ASSIGNED = "Evaluator Assigned";
 

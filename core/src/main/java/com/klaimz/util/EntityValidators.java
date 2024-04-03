@@ -28,13 +28,13 @@ public class EntityValidators {
             emptyCheck(Product::getUid, "Product must have a UID"),
             emptyCheck(Product::getName, "Product must have a name"),
             product -> {
-                if (product.getGstPercentage() < 0 || product.getGstPercentage() > 100) {
-                    return "Product GST percentage must be between 0 and 100";
+                if (product.getGstPercentage() < 0 || product.getGstPercentage() > 28) {
+                    return "Product GST percentage must be between 0 and 28";
                 }
                 return VERIFIED;
             },
             product -> {
-                if (product.getMrp() > 0) {
+                if (product.getMrp() <= 0) {
                     return "Product mrp must be greater than 0";
                 }
                 return VERIFIED;
@@ -96,6 +96,7 @@ public class EntityValidators {
 
                 //  check if all products exist
                 var isAllProductsValid = claim.getProducts().stream().map(Claim.ProductDTO::getId)
+
                         .map(productRepository::findById)
                         .noneMatch(Optional::isEmpty);
                 if (!isAllProductsValid) {
