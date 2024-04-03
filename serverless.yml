@@ -93,6 +93,9 @@ functions:
             path: /user/search
             method: post
         - httpApi:
+            path: /user/all
+            method: get
+        - httpApi:
             path: /warmup
             method: get
         - httpApi:

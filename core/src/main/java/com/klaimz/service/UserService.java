@@ -8,13 +8,11 @@ import com.klaimz.repo.LoginRepository;
 import com.klaimz.repo.RoleRepository;
 import com.klaimz.repo.UserRepository;
 import com.klaimz.util.HashUtils;
-import io.micronaut.serde.ObjectMapper;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.serde.bson.BsonJsonMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.bson.types.ObjectId;
 
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
@@ -122,9 +120,8 @@ public class UserService {
         }
     }
 
-    public void getAllUsers() {
-       var all = userRepository.findAll();
-       all.forEach(System.out::println);
+    public @NonNull List<User> getAllUsers() {
+       return userRepository.findAll();
     }
 }
 /*

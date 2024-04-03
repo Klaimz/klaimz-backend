@@ -51,6 +51,16 @@ public class UserController {
         return success(user, "User found");
     }
 
+    @Get("/all")
+    public HttpResponse<MessageBean> getAllUsers() {
+        var result = userService.getAllUsers();
+
+        if (result.isEmpty()) {
+            return badRequest("No user found");
+        }
+        return success(result, "All users");
+    }
+
     @Post("/search")
     public HttpResponse<MessageBean> search(@Body Filter filter) {
         var result = userService.findByField(filter);
