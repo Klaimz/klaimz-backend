@@ -1,6 +1,5 @@
 package com.klaimz.api.auth;
 
-import com.klaimz.repo.LoginRepository;
 import com.klaimz.service.UserService;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.errors.OauthErrorResponseException;

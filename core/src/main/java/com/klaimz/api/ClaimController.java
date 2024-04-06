@@ -19,6 +19,7 @@ import jakarta.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Principal;
+import java.util.ArrayList;
 
 import static com.klaimz.util.HttpUtils.*;
 import static io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED;
@@ -56,8 +57,8 @@ public class ClaimController {
         return success(claim, "Claim status updated");
     }
 
-    @Post(  "/{id}/{fieldKey}/upload")
-    public HttpResponse<MessageBean> upload(@PathVariable String fieldKey, @PathVariable String id,@QueryValue("file") String fileName) {
+    @Post("/{id}/{fieldKey}/upload")
+    public HttpResponse<MessageBean> upload(@PathVariable String fieldKey, @PathVariable String id, @QueryValue("file") String fileName) {
         var claim = claimService.getClaimById(id);
         var field = claim.getField(fieldKey);
 
@@ -65,26 +66,26 @@ public class ClaimController {
             return badRequest("File already uploaded");
         }
 
-       // check if the file name doesn't contain any special characters
+        // check if the file name doesn't contain any special characters
         if (!fileName.matches("^[a-zA-Z0-9_.-]*$")) {
             return badRequest("Invalid file name");
         }
 
         // generate pre-signed URL for the file upload
-        var presignedUrlDto  = s3FileService.generatePresignedPutUrl(id, fieldKey, fileName);
+        var presignedUrlDto = s3FileService.generatePresignedPutUrl(id, fieldKey, fileName);
 
         // update the field value with the new file name
-        var newFieldValue = field.getValue().isEmpty()? fileName : field.getValue() + ";" + fileName;
+        var newFieldValue = field.getValue().isEmpty() ? fileName : field.getValue() + ";" + fileName;
 
         claim.updateField(fieldKey, newFieldValue);
-        claimService.updateClaim(claim,true);
+        claimService.updateClaim(claim, true);
 
         return success(presignedUrlDto, "Pre-signed URL generated successfully");
     }
 
     @Get("/{id}/{fieldKey}/download")
-    public HttpResponse download(@PathVariable String fieldKey, @PathVariable String id,@QueryValue("file") String fileName) throws URISyntaxException {
-        var presignedUrlDto = s3FileService.generatePresignedGetUrl(id, fieldKey,fileName);
+    public HttpResponse download(@PathVariable String fieldKey, @PathVariable String id, @QueryValue("file") String fileName) throws URISyntaxException {
+        var presignedUrlDto = s3FileService.generatePresignedGetUrl(id, fieldKey, fileName);
         var url = presignedUrlDto.getUrl();
 
         return HttpResponse.redirect(new URI(url));
@@ -92,7 +93,7 @@ public class ClaimController {
 
     @Post
     public HttpResponse<MessageBean> createClaim(@Body Claim claim, @NonNull Principal principal) {
-        var newClaim = claimService.createClaim(claim,principal.getName());
+        var newClaim = claimService.createClaim(claim, principal.getName());
         return success(newClaim, "Claim created successfully");
     }
 
@@ -103,7 +104,7 @@ public class ClaimController {
             return badRequest("Claim id mismatch");
         }
 
-        var updatedClaim = claimService.updateClaim(claim,true);
+        var updatedClaim = claimService.updateClaim(claim, true);
         return success(updatedClaim, "Claim updated successfully");
     }
 
@@ -111,29 +112,19 @@ public class ClaimController {
     @Get("/all")
     public HttpResponse<MessageBean> getAllClaims() {
         var claims = claimService.getAllClaims();
-        if (claims.isEmpty()) {
-            return notFound("No claims found");
-        }
+
         return success(claims, "Claims found");
     }
 
     @Post("/search")
     public HttpResponse<MessageBean> search(@Body Filter filter) {
         var result = claimService.findByField(filter);
-        if (result.isEmpty()) {
-            return notFound("No claim found");
-        }
-
         return success(result, "Claim search result");
     }
 
     @Get("/types")
     public HttpResponse<MessageBean> getClaimTypes() {
         var claimTypes = claimService.getAllClaimTypes();
-
-        if (claimTypes.isEmpty()) {
-            return notFound("No claim types found");
-        }
 
         return success(claimTypes, "Claim types found");
     }

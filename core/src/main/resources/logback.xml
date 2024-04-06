@@ -23,7 +23,7 @@
     <!--    logging for http client -->
 <!--    <logger name="io.micronaut.http.client" level="trace" />-->
 
-    <logger name="io.micronaut" level="trace" />
+<!--    <logger name="io.micronaut" level="trace" />-->
 
 <!--    <logger name="io.micronaut.data" level="trace" />-->
 </configuration>
