@@ -77,7 +77,7 @@ public class ClaimService {
             }
         });
 
-//        set product values form the product repository
+        //  set product values form the product repository
         claim.getProducts().forEach(productDTO -> {
             var productObj = productRepository.findById(productDTO.getId());
             if (productObj.isEmpty()) {

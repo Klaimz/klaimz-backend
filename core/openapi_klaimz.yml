@@ -1,0 +1,543 @@
+openapi: 3.0.1
+info:
+  title: Klaimz Backend API
+  description: "This is the backend API for Klaimz app. It is a RESTful API that provides\
+    \ endpoints for managing users, roles, and form fields."
+  version: "1.0"
+paths:
+  /claim:
+    post:
+      operationId: createClaim
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Claim'
+        required: true
+      responses:
+        "200":
+          description: createClaim 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
+  /claim/all:
+    get:
+      operationId: getAllClaims
+      responses:
+        "200":
+          description: getAllClaims 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
+  /claim/search:
+    post:
+      operationId: search
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Filter'
+        required: true
+      responses:
+        "200":
+          description: search 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
+  /claim/types:
+    get:
+      operationId: getClaimTypes
+      responses:
+        "200":
+          description: getClaimTypes 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
+    post:
+      operationId: createClaimType
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClaimType'
+        required: true
+      responses:
+        "200":
+          description: createClaimType 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
+  /claim/{id}:
+    get:
+      operationId: getClaimById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: getClaimById 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
+    patch:
+      operationId: updateClaim
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Claim'
+        required: true
+      responses:
+        "200":
+          description: updateClaim 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
+  /claim/{id}/comment:
+    post:
+      operationId: addComment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericDto'
+        required: true
+      responses:
+        "200":
+          description: addComment 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
+  /claim/{id}/status:
+    post:
+      operationId: updateStatus
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericDto'
+        required: true
+      responses:
+        "200":
+          description: updateStatus 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
+  /claim/{id}/{fieldKey}/download:
+    get:
+      operationId: download
+      parameters:
+      - name: fieldKey
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: file
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: download 200 response
+          content:
+            application/json:
+              schema:
+                type: object
+  /claim/{id}/{fieldKey}/upload:
+    post:
+      operationId: upload
+      parameters:
+      - name: fieldKey
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: file
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: upload 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
+  /product:
+    post:
+      operationId: createProduct
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      responses:
+        "200":
+          description: createProduct 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
+  /product/all:
+    get:
+      operationId: getAllProducts
+      responses:
+        "200":
+          description: getAllProducts 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
+  /product/{id}:
+    get:
+      operationId: getProductById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: getProductById 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
+  /user/all:
+    get:
+      operationId: getAllUsers
+      responses:
+        "200":
+          description: getAllUsers 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
+  /user/me:
+    get:
+      operationId: me
+      responses:
+        "200":
+          description: me 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
+  /user/search:
+    post:
+      operationId: search_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Filter'
+        required: true
+      responses:
+        "200":
+          description: search_1 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
+  /user/signup:
+    post:
+      operationId: registerUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSignUp'
+        required: true
+      responses:
+        "200":
+          description: registerUser 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
+  /user/{id}:
+    get:
+      operationId: getUserById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: getUserById 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
+  /warmup:
+    get:
+      operationId: warmUp
+      responses:
+        "200":
+          description: warmUp 200 response
+          content:
+            application/json:
+              schema:
+                type: string
+components:
+  schemas:
+    Claim:
+      required:
+      - amount
+      - claim-manager
+      - claim-manager-user-id
+      - claim-template-id
+      - created-date
+      - evaluator
+      - evaluator-user-id
+      - fields
+      - id
+      - products
+      - requester
+      - requester-user-id
+      - status
+      - update-date
+      - updates
+      type: object
+      properties:
+        id:
+          type: string
+        amount:
+          type: string
+        created-date:
+          type: string
+          format: date-time
+        status:
+          type: string
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/Claim.ProductDTO'
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/Claim.FormFieldValue'
+        update-date:
+          type: string
+          format: date-time
+        requester-user-id:
+          type: string
+        evaluator-user-id:
+          type: string
+        claim-manager-user-id:
+          type: string
+        requester:
+          $ref: '#/components/schemas/User'
+        evaluator:
+          $ref: '#/components/schemas/User'
+        claim-manager:
+          $ref: '#/components/schemas/User'
+        updates:
+          type: array
+          items:
+            $ref: '#/components/schemas/Claim.ClaimUpdate'
+        claim-template-id:
+          type: string
+    Claim.ClaimUpdate:
+      required:
+      - comment
+      - id
+      - new-value
+      - old-value
+      - time
+      - type
+      - user
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        comment:
+          type: string
+        new-value:
+          type: string
+        old-value:
+          type: string
+        time:
+          type: integer
+          format: int64
+        user:
+          type: string
+    Claim.FormFieldValue:
+      type: object
+      properties:
+        key:
+          type: string
+        type:
+          type: string
+        value:
+          type: string
+    Claim.ProductDTO:
+      type: object
+      properties:
+        id:
+          type: string
+        description:
+          type: string
+        quantity:
+          type: integer
+          format: int32
+        mrp:
+          type: number
+          format: double
+        name:
+          type: string
+        uid:
+          type: string
+        gst-percentage:
+          type: number
+          format: double
+    ClaimType:
+      required:
+      - id
+      - type-name
+      type: object
+      properties:
+        id:
+          type: string
+        type-name:
+          type: string
+    Filter:
+      type: object
+      properties:
+        field:
+          type: string
+        value:
+          type: string
+    GenericDto:
+      type: object
+      properties:
+        body:
+          type: string
+    MessageBean:
+      type: object
+      properties:
+        message:
+          type: string
+        stack-trace:
+          type: string
+        data: {}
+    Product:
+      required:
+      - gst-percentage
+      - id
+      - mrp
+      - name
+      - uid
+      type: object
+      properties:
+        id:
+          type: string
+        mrp:
+          type: number
+          format: double
+        name:
+          type: string
+        uid:
+          type: string
+        gst-percentage:
+          type: number
+          format: double
+    User:
+      required:
+      - active
+      - address
+      - company-name
+      - created-date
+      - display-name
+      - email
+      - gst-number
+      - id
+      - last-login-date
+      - phone
+      - region
+      - roles
+      type: object
+      properties:
+        id:
+          type: string
+        display-name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        company-name:
+          type: string
+        address:
+          type: string
+        gst-number:
+          type: string
+        region:
+          type: string
+        last-login-date:
+          type: string
+          format: date-time
+        created-date:
+          type: string
+          format: date-time
+        active:
+          type: boolean
+        roles:
+          type: array
+          items:
+            type: string
+    UserSignUp:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/User'
+      - properties:
+          password:
+            type: string

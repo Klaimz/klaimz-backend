@@ -38,36 +38,40 @@ shadowJar{
     archiveVersion.set('')
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs = [
+            '-parameters'
+    ]
+}
+
 dependencies {
     localRuntime("io.micronaut:micronaut-http-server-netty:$micronautVersion")
     compileOnly 'org.projectlombok:lombok:1.18.28'
+    compileOnly("io.micronaut.openapi:micronaut-openapi-annotations")
+
+
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
     annotationProcessor("io.micronaut:micronaut-http-validation")
     annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
-// https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api
-    implementation 'jakarta.persistence:jakarta.persistence-api:3.2.0-M1'
-
+    annotationProcessor("io.micronaut.openapi:micronaut-openapi")
     annotationProcessor("io.micronaut.security:micronaut-security-annotations")
+    annotationProcessor("io.micronaut.data:micronaut-data-document-processor")
 
+    implementation 'jakarta.persistence:jakarta.persistence-api:3.2.0-M1'
     implementation("io.micronaut:micronaut-jackson-databind")
     implementation("io.micronaut.aws:micronaut-aws-sdk-v2")
     implementation("io.micronaut.crac:micronaut-crac")
     implementation("io.micronaut.validation:micronaut-validation")
     implementation("jakarta.validation:jakarta.validation-api")
     implementation("io.micronaut.aws:micronaut-function-aws-api-proxy")
-
     implementation("io.micronaut.security:micronaut-security-jwt")
     implementation 'io.projectreactor:reactor-core:3.6.3'
     implementation("software.amazon.awssdk:s3")
-
-
-    annotationProcessor("io.micronaut.data:micronaut-data-document-processor")
     implementation("io.micronaut.data:micronaut-data-mongodb")
+
+
     runtimeOnly("org.mongodb:mongodb-driver-sync")
-
     runtimeOnly("ch.qos.logback:logback-classic")
-
-
 
 
     testImplementation("io.micronaut:micronaut-http-client")
