@@ -4,6 +4,8 @@ import com.klaimz.model.Claim;
 import com.klaimz.model.FormField;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public final class Constants {
 
@@ -21,6 +23,11 @@ public final class Constants {
     public static String STATUS_APPROVED = "Approved";
 
     public static List<String> STATUS_LIST = List.of(STATUS_NEW, STATUS_CM_ASSIGNED, STATUS_EVALUATOR_ASSIGNED, STATUS_EVALUATION_IN_PROGRESS, STATUS_APPROVAL_IN_PROGRESS, STATUS_DENIED, STATUS_APPROVED);
+
+    public static final String MATCH = "$match";
+    public static final String FIRST = "$first";
+    public static final String TO_DOUBLE = "$toDouble";
+    public static final String GROUP = "$group";
 
 
 

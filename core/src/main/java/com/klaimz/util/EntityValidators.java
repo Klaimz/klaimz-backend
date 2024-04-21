@@ -45,9 +45,9 @@ public class EntityValidators {
     private final List<Function<Claim, String>> CLAIM_VALIDATORS = List.of(
             emptyCheck(Claim::getAmount, "Claim amount must have a value"),
             emptyCheck(Claim::getStatus, "Claim must have a status"),
-            emptyCheck(Claim::getRequesterUserId, "Claim must have a requester"),
-            emptyCheck(Claim::getClaimManagerUserId, "Claim must have an evaluator", claim -> claim.getStatus().equals(STATUS_CM_ASSIGNED)),
-            emptyCheck(Claim::getEvaluatorUserId, "Claim must have a claim manager", claim -> claim.getStatus().equals(STATUS_EVALUATOR_ASSIGNED)),
+            emptyCheck(Claim::getRequester, "Claim must have a requester"),
+//            emptyCheck(Claim::getClaimManagerUserId, "Claim must have an evaluator", claim -> claim.getStatus().equals(STATUS_CM_ASSIGNED)),
+//            emptyCheck(Claim::getEvaluatorUserId, "Claim must have a claim manager", claim -> claim.getStatus().equals(STATUS_EVALUATOR_ASSIGNED)),
             // claim amount must be greater than 0 and valid currency
             claim -> {
                 if (!isCurrency(claim.getAmount())) {

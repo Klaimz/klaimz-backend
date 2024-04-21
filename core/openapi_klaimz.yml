@@ -5,6 +5,22 @@ info:
     \ endpoints for managing users, roles, and form fields."
   version: "1.0"
 paths:
+  /analytics/claim:
+    post:
+      operationId: getClaimAnalytics
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChartAnalyticsRequest'
+        required: true
+      responses:
+        "200":
+          description: getClaimAnalytics 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
   /claim:
     post:
       operationId: createClaim
@@ -327,20 +343,30 @@ paths:
                 type: string
 components:
   schemas:
+    ChartAnalyticsRequest:
+      type: object
+      properties:
+        filters:
+          type: array
+          items:
+            $ref: '#/components/schemas/Filter'
+        group-by:
+          type: string
+        aggregate-by:
+          type: string
+        aggregate-type:
+          type: string
     Claim:
       required:
       - amount
       - claim-manager
-      - claim-manager-user-id
       - claim-template-id
       - created-date
       - evaluator
-      - evaluator-user-id
       - fields
       - id
       - products
       - requester
-      - requester-user-id
       - status
       - update-date
       - updates
@@ -366,12 +392,6 @@ components:
         update-date:
           type: string
           format: date-time
-        requester-user-id:
-          type: string
-        evaluator-user-id:
-          type: string
-        claim-manager-user-id:
-          type: string
         requester:
           $ref: '#/components/schemas/User'
         evaluator:

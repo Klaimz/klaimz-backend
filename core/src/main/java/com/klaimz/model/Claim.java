@@ -32,9 +32,6 @@ public class Claim {
 
     @DateUpdated
     private Date updateDate;
-    private String requesterUserId;
-    private String evaluatorUserId;
-    private String claimManagerUserId;
 
     private User requester;
 

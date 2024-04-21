@@ -2,40 +2,17 @@ package com.klaimz.repo;
 
 
 import com.klaimz.model.Claim;
-import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.annotation.Nullable;
 import io.micronaut.data.annotation.Join;
 import io.micronaut.data.mongodb.annotation.MongoRepository;
 import io.micronaut.data.repository.CrudRepository;
 import io.micronaut.data.repository.jpa.JpaSpecificationExecutor;
 import io.micronaut.data.repository.jpa.criteria.PredicateSpecification;
 
-import java.util.List;
-import java.util.Optional;
-
 @MongoRepository
+@Join(value = "requester")
+@Join(value = "evaluator")
+@Join(value = "claimManager")
 public interface ClaimRepository extends CrudRepository<Claim, String>, JpaSpecificationExecutor<Claim> {
-
-
-//    find all query that automatically join the user table to get the user details
-    @Join(value = "requester")
-    @Join(value = "evaluator")
-    @Join(value = "claimManager")
-    List<Claim> findAll();
-
-
-
-    @Join(value = "requester")
-    @Join(value = "evaluator")
-    @Join(value = "claimManager")
-    @Override
-    @NonNull Optional<Claim> findById(@NonNull String s);
-
-    @Override
-    @Join(value = "requester")
-    @Join(value = "evaluator")
-    @Join(value = "claimManager")
-    @NonNull List<Claim> findAll(@Nullable PredicateSpecification<Claim> spec);
 
     class Specification {
         public static PredicateSpecification<Claim> findByField(String field, String value) {

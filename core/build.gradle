@@ -70,7 +70,7 @@ dependencies {
     implementation("io.micronaut.data:micronaut-data-mongodb")
 
 
-    runtimeOnly("org.mongodb:mongodb-driver-sync")
+    implementation("org.mongodb:mongodb-driver-sync")
     runtimeOnly("ch.qos.logback:logback-classic")
 
 

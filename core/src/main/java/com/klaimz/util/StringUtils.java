@@ -1,15 +1,18 @@
 package com.klaimz.util;
 
+import org.bson.*;
+import org.bson.conversions.Bson;
+
 import java.util.function.Function;
 
 public final class StringUtils {
     public static String VERIFIED = "verified";
 
-    public static <T> Function<T, String> emptyCheck(Function<T, String> generator, String message, Function<T, Boolean> shouldCheck) {
+    public static <T> Function<T, String> emptyCheck(Function<T, Object> generator, String message, Function<T, Boolean> shouldCheck) {
         return user -> {
             if (shouldCheck.apply(user)) {
                 var value = generator.apply(user);
-                if (value == null || value.isBlank()) {
+                if (value == null || (value instanceof String && ((String) value).isBlank())) {
                     return message;
                 }
             }
@@ -17,10 +20,9 @@ public final class StringUtils {
         };
     }
 
-    public static <T> Function<T, String> emptyCheck(Function<T, String> generator, String message) {
+    public static <T> Function<T, String> emptyCheck(Function<T, Object> generator, String message) {
         return emptyCheck(generator, message, user -> true);
     }
-
 
     public static String emptyCheck(String value, String message) {
         return emptyCheck(Function.identity(), message, user -> true).apply(value);
@@ -29,6 +31,24 @@ public final class StringUtils {
     // check if string is currency
     public static boolean isCurrency(String str) {
         return str.matches("^[0-9]+(\\.[0-9]{1,2})?$");
+    }
+
+
+    // string to bson
+    public static BsonDocument bson(String key, BsonValue value) {
+        return new BsonDocument(key, value);
+    }
+
+    public static BsonDocument bson(String key, BsonDocument value) {
+        return new BsonDocument(key, value);
+    }
+
+
+    public static BsonValue bsonV(Object value) {
+        if (value instanceof Number) {
+            return new BsonDouble(Double.parseDouble(value.toString()));
+        }
+        return new BsonString(value.toString());
     }
 
 }

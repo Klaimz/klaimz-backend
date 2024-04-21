@@ -3,11 +3,11 @@ package com.klaimz.service;
 
 import com.klaimz.model.Claim;
 import com.klaimz.model.ClaimType;
+import com.klaimz.model.User;
 import com.klaimz.model.api.Filter;
 import com.klaimz.repo.*;
 import com.klaimz.util.Constants;
 import com.klaimz.util.EntityValidators;
-import io.micronaut.core.annotation.NonNull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -54,15 +54,15 @@ public class ClaimService {
 
     public Claim createClaim(Claim claim, String requesterId) {
 
-        claim.setRequesterUserId(requesterId);
+        claim.setRequester(User.builder().id(requesterId).build());
         claim.setStatus(Constants.STATUS_NEW);
         entityValidators.validateClaim(claim);
 
         claim.setId(null); // ensure id is not set
         claim.setCreatedDate(null); // ensure created date is not set
         claim.setUpdateDate(null); // ensure update date is not set
-        claim.setEvaluatorUserId(null); // ensure evaluator is not set
-        claim.setClaimManagerUserId(null); // ensure claim manager is not set
+        claim.setEvaluator(null); // ensure evaluator is not set
+        claim.setClaimManager(null); // ensure claim manager is not set
 
         return updateClaim(claim, false);
     }
@@ -94,35 +94,13 @@ public class ClaimService {
             });
         });
 
-        if (claim.getRequesterUserId() != null) {
-            var requester = userRepository.findById(claim.getRequesterUserId());
-            if (requester.isEmpty()) {
-                throw new IllegalArgumentException("Requester not found");
-            }
-            claim.setRequester(requester.get());
-        }
-
-        if (claim.getEvaluatorUserId() != null) {
-            var evaluator = userRepository.findById(claim.getEvaluatorUserId());
-            if (evaluator.isEmpty()) {
-                throw new IllegalArgumentException("Evaluator not found");
-            }
-            claim.setEvaluator(evaluator.get());
-        }
-
-        if (claim.getClaimManagerUserId() != null) {
-            var claimManager = userRepository.findById(claim.getClaimManagerUserId());
-            if (claimManager.isEmpty()) {
-                throw new IllegalArgumentException("Claim manager not found");
-            }
-            claim.setClaimManager(claimManager.get());
-        }
-
         if (update) {
-            return claimRepository.update(claim);
+             claimRepository.update(claim);
         } else {
-            return claimRepository.save(claim);
+             claimRepository.save(claim);
         }
+
+        return getClaimById(claim.getId());
     }
 
     public Claim addComment(String claimId, String comment, String user) {
