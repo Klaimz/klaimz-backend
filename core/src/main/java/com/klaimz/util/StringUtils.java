@@ -1,8 +1,5 @@
 package com.klaimz.util;
 
-import org.bson.*;
-import org.bson.conversions.Bson;
-
 import java.util.function.Function;
 
 public final class StringUtils {
@@ -31,24 +28,6 @@ public final class StringUtils {
     // check if string is currency
     public static boolean isCurrency(String str) {
         return str.matches("^[0-9]+(\\.[0-9]{1,2})?$");
-    }
-
-
-    // string to bson
-    public static BsonDocument bson(String key, BsonValue value) {
-        return new BsonDocument(key, value);
-    }
-
-    public static BsonDocument bson(String key, BsonDocument value) {
-        return new BsonDocument(key, value);
-    }
-
-
-    public static BsonValue bsonV(Object value) {
-        if (value instanceof Number) {
-            return new BsonDouble(Double.parseDouble(value.toString()));
-        }
-        return new BsonString(value.toString());
     }
 
 }

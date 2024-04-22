@@ -10,6 +10,5 @@ import java.util.List;
 
 @MongoRepository
 public interface RoleRepository extends CrudRepository<Role, String> {
-
     List<Role> findByKeyIn(List<String> keys);
 }

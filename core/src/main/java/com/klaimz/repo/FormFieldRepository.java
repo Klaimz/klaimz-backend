@@ -7,5 +7,4 @@ import io.micronaut.data.repository.jpa.JpaSpecificationExecutor;
 
 
 @MongoRepository
-public interface FormFieldRepository extends CrudRepository<FormField, String>, JpaSpecificationExecutor<FormField> {
-}
+public interface FormFieldRepository extends CrudRepository<FormField, String>, JpaSpecificationExecutor<FormField> { }

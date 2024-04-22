@@ -3,6 +3,7 @@ package com.klaimz.model;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.data.annotation.*;
 import io.micronaut.serde.annotation.Serdeable;
+import jakarta.persistence.OneToOne;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -33,10 +34,14 @@ public class Claim {
     @DateUpdated
     private Date updateDate;
 
+
+    @OneToOne
     private User requester;
 
+    @OneToOne
     private User evaluator;
 
+    @OneToOne
     private User claimManager;
 
 

@@ -8,6 +8,4 @@ import java.util.List;
 
 
 @MongoRepository
-public interface ProductRepository extends CrudRepository<Product, String> {
-    List<Product> findByUid(String uid);
-}
+public interface ProductRepository extends CrudRepository<Product, String> { }

@@ -8,8 +8,10 @@ import com.klaimz.model.api.Filter;
 import com.klaimz.repo.*;
 import com.klaimz.util.Constants;
 import com.klaimz.util.EntityValidators;
+import com.klaimz.util.MongoUtils;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.bson.conversions.Bson;
 
 import java.util.List;
 
@@ -47,8 +49,10 @@ public class ClaimService {
         return claimRepository.findAll();
     }
 
-    public List<Claim> findByField(Filter filter) {
-        return claimRepository.findAll(ClaimRepository.Specification.findByField(filter.getField(), filter.getValue()));
+    public List<Claim> findByField(List<Filter> filters) {
+        var matchFilter = MongoUtils.filterForClaims(filters);
+
+        return claimRepository.findAll(matchFilter);
     }
 
 
@@ -95,9 +99,9 @@ public class ClaimService {
         });
 
         if (update) {
-             claimRepository.update(claim);
+            claimRepository.update(claim);
         } else {
-             claimRepository.save(claim);
+            claimRepository.save(claim);
         }
 
         return getClaimById(claim.getId());

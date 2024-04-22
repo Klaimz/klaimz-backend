@@ -8,5 +8,4 @@ import org.bson.types.ObjectId;
 
 
 @MongoRepository
-public interface ClaimTemplateRepository extends CrudRepository<ClaimTemplate, String>, JpaSpecificationExecutor<ClaimTemplate> {
-}
+public interface ClaimTemplateRepository extends CrudRepository<ClaimTemplate, String>, JpaSpecificationExecutor<ClaimTemplate> { }

@@ -24,14 +24,6 @@ public final class Constants {
 
     public static List<String> STATUS_LIST = List.of(STATUS_NEW, STATUS_CM_ASSIGNED, STATUS_EVALUATOR_ASSIGNED, STATUS_EVALUATION_IN_PROGRESS, STATUS_APPROVAL_IN_PROGRESS, STATUS_DENIED, STATUS_APPROVED);
 
-    public static final String MATCH = "$match";
-    public static final String FIRST = "$first";
-    public static final String TO_DOUBLE = "$toDouble";
-    public static final String GROUP = "$group";
-
-
-
-
 
 
     public static List<FormField> FORM_FIELDS = List.of(

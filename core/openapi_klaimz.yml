@@ -54,7 +54,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Filter'
+              type: array
+              items:
+                $ref: '#/components/schemas/Filter'
         required: true
       responses:
         "200":
@@ -393,11 +395,17 @@ components:
           type: string
           format: date-time
         requester:
-          $ref: '#/components/schemas/User'
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/User'
         evaluator:
-          $ref: '#/components/schemas/User'
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/User'
         claim-manager:
-          $ref: '#/components/schemas/User'
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/User'
         updates:
           type: array
           items:

@@ -20,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.klaimz.util.HttpUtils.*;
 import static io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED;
@@ -117,8 +118,8 @@ public class ClaimController {
     }
 
     @Post("/search")
-    public HttpResponse<MessageBean> search(@Body Filter filter) {
-        var result = claimService.findByField(filter);
+    public HttpResponse<MessageBean> search(@Body List<Filter> filters) {
+        var result = claimService.findByField(filters);
         return success(result, "Claim search result");
     }
 
