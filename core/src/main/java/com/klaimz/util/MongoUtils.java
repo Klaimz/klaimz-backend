@@ -4,13 +4,17 @@ import com.klaimz.model.Claim;
 import com.klaimz.model.User;
 import com.klaimz.model.api.ChartAnalyticsRequest;
 import com.klaimz.model.api.Filter;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.BsonField;
 import org.bson.*;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.BiFunction;
+
+import static com.mongodb.client.model.Aggregates.unwind;
 
 public final class MongoUtils {
 
@@ -67,13 +71,15 @@ public final class MongoUtils {
     }
 
     public static Bson group(ChartAnalyticsRequest request) {
-        BsonDocument group = new BsonDocument();
-        BsonString groupBy = new BsonString("$" + request.getGroupBy());
-        group.append("_id", groupBy);
-        group.append("xvalue", bson(FIRST, groupBy));
-        group.append("yvalue", bson("$" + request.getAggregateType(), bson(TO_DOUBLE, bsonV("$" + request.getAggregateBy()))));
+        String groupBy = "$" + request.getGroupBy();
+        Bson aggregateBy = bson(TO_DOUBLE, bsonV("$" + request.getAggregateBy()));
 
-        return bson(GROUP, group);
+
+        var accumulators = new ArrayList<BsonField>();
+        accumulators.add(Accumulators.first("xvalue", groupBy));
+        accumulators.add(Accumulators.sum("yvalue", aggregateBy));
+
+        return Aggregates.group(groupBy, accumulators);
     }
 
     public static BsonValue matchIdClaim(String field, String value) {
@@ -101,24 +107,37 @@ public final class MongoUtils {
         Arrays.stream(Claim.class.getDeclaredFields())
                 .filter(field -> field.getType().equals(User.class))
                 .forEach(field -> {
-                    pipeline.add(createLookupStage(field.getName()));
-                    pipeline.add(createUnwindStage(field.getName()));
+                    String fieldName = field.getName();
+
+                    BsonDocument lookupStage = bson("$lookup", new BsonDocument()
+                            .append("from", bsonV("user"))
+                            .append("localField", bsonV(fieldName + "._id"))
+                            .append("foreignField", bsonV("_id"))
+                            .append("as", bsonV(fieldName)));
+                    pipeline.add(lookupStage);
+
+                    BsonDocument unwindStage = bson("$unwind", new BsonDocument()
+                            .append("path", bsonV("$" + fieldName))
+                            .append("preserveNullAndEmptyArrays", bsonV(true)));
+                    pipeline.add(unwindStage);
                 });
 
         return pipeline;
     }
 
-    private static Bson createLookupStage(String fieldName) {
-        return bson(LOOKUP, new BsonDocument()
-                .append("from", bsonV("user"))
-                .append("localField", bsonV(fieldName + "._id"))
-                .append("foreignField", bsonV("_id"))
-                .append("as", bsonV(fieldName)));
-    }
+    public static ArrayList<Bson> createAnalyticsPipeline(ChartAnalyticsRequest request) {
+        var pipeline = new ArrayList<Bson>();
 
-    private static Bson createUnwindStage(String fieldName) {
-        return bson(UNWIND, new BsonDocument()
-                .append("path", bsonV("$" + fieldName))
-                .append("preserveNullAndEmptyArrays", bsonV(true)));
+        Optional.ofNullable(request.getFilters())
+                .filter(filters -> !filters.isEmpty())
+                .ifPresent(filters -> pipeline.add(aggregateMatch(filters, Claim.class)));
+
+
+        if (request.getGroupBy().startsWith("products.")) {
+            pipeline.add(unwind("$products"));
+        }
+
+        pipeline.add(group(request));
+        return pipeline;
     }
 }

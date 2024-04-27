@@ -8,7 +8,7 @@ import io.micronaut.http.HttpResponse;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-public class HttpUtils {
+public final class HttpUtils {
 
     // bad request
     public static HttpResponse<MessageBean> badRequest(String message) {
@@ -17,14 +17,15 @@ public class HttpUtils {
     }
 
     // print stack trace to string of an exception
-    public static String stackTrace(Exception e){
-        var stringWriter  = new StringWriter();
+    public static String stackTrace(Exception e) {
+        var stringWriter = new StringWriter();
         PrintWriter pw = new PrintWriter(stringWriter);
         e.printStackTrace(pw);
         pw.flush();
         pw.close();
         return stringWriter.toString();
     }
+
     // handle exception
     public static HttpResponse<MessageBean> handleException(Exception e) {
         e.printStackTrace();
@@ -39,13 +40,13 @@ public class HttpUtils {
     }
 
     // success response
-    public static <T> HttpResponse<MessageBean> success(T data,String message) {
+    public static <T> HttpResponse<MessageBean> success(T data, String message) {
         return HttpResponse.ok(SuccessBean.builder()
                 .data(data)
                 .message(message).build());
     }
 
-    public  static HttpResponse<MessageBean> success(String message) {
+    public static HttpResponse<MessageBean> success(String message) {
         return HttpResponse.ok(SuccessBean.builder()
                 .data(null)
                 .message(message).build());
