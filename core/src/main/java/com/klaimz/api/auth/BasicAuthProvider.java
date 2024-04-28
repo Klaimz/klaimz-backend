@@ -5,16 +5,21 @@ import com.klaimz.model.User;
 import com.klaimz.repo.LoginRepository;
 import com.klaimz.service.UserService;
 import com.klaimz.util.HashUtils;
+import com.nimbusds.jose.shaded.gson.Gson;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.security.authentication.*;
+import io.micronaut.serde.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Singleton
@@ -60,9 +65,10 @@ public class BasicAuthProvider implements AuthenticationProvider<HttpRequest<?>>
             }
 
             userService.updateLoginDate(optionalUser.get().getId());
+            var userMap = Map.of("user",(Object) optionalUser.get());
 
             return Flux.create(emitter -> {
-                emitter.next(AuthenticationResponse.success(optionalUser.get().getId()));
+                emitter.next(AuthenticationResponse.success(optionalUser.get().getId(), userMap));
                 emitter.complete();
             });
 
