@@ -17,6 +17,6 @@ public class ChartEntry {
 
     @Id
     private String _id;
-    private Double yvalue;
-    private String xvalue;
+    private Double y;
+    private String x;
 }

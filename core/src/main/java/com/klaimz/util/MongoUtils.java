@@ -16,10 +16,11 @@ import static com.mongodb.client.model.Aggregates.unwind;
 
 public final class MongoUtils {
 
-    public static final String MATCH = "$match";
     public static final String TO_DOUBLE = "$toDouble";
 
     private static final Map<Class<?>, BiFunction<String, String, BsonValue>> classToMatchId = new HashMap<>();
+    public static final String X = "x";
+    public static final String Y = "y";
 
 
     static {
@@ -51,7 +52,7 @@ public final class MongoUtils {
     }
 
     public static Bson aggregateMatch(List<Filter> filters, Class<?> clazz) {
-        return bson(MATCH, match(filters, clazz));
+        return Aggregates.match(match(filters, clazz));
     }
 
 
@@ -70,8 +71,16 @@ public final class MongoUtils {
 
 
         var accumulators = new ArrayList<BsonField>();
-        accumulators.add(Accumulators.first("xvalue", groupBy));
-        accumulators.add(Accumulators.sum("yvalue", aggregateBy));
+        accumulators.add(Accumulators.first(X, groupBy));
+
+        switch (request.getAggregateType()) {
+            case "avg" -> accumulators.add(Accumulators.avg(Y, aggregateBy));
+            case "count" -> accumulators.add(Accumulators.sum(Y, new BsonInt32(1)));
+            case "max" -> accumulators.add(Accumulators.max(Y, aggregateBy));
+            case "min" -> accumulators.add(Accumulators.min(Y, aggregateBy));
+
+            default -> accumulators.add(Accumulators.sum(Y, aggregateBy));
+        }
 
         return Aggregates.group(groupBy, accumulators);
     }
@@ -109,7 +118,7 @@ public final class MongoUtils {
                     var unwindOptions = new UnwindOptions();
                     unwindOptions.preserveNullAndEmptyArrays(true);
                     // Add unwind stage to the pipeline
-                    pipeline.add(Aggregates.unwind("$" + fieldName,unwindOptions));
+                    pipeline.add(Aggregates.unwind("$" + fieldName, unwindOptions));
                 });
 
         return pipeline;
