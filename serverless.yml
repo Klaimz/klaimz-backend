@@ -140,3 +140,6 @@ functions:
         - httpApi:
             path: /product
             method: post
+        - httpApi:
+            path: /analytics/claim
+            method: post

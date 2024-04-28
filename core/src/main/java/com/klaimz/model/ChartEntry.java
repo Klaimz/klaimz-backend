@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@MappedEntity( "claim")
+@MappedEntity("claim")
 public class ChartEntry {
 
     @Id
