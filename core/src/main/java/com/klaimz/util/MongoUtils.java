@@ -4,9 +4,7 @@ import com.klaimz.model.Claim;
 import com.klaimz.model.User;
 import com.klaimz.model.api.ChartAnalyticsRequest;
 import com.klaimz.model.api.Filter;
-import com.mongodb.client.model.Accumulators;
-import com.mongodb.client.model.Aggregates;
-import com.mongodb.client.model.BsonField;
+import com.mongodb.client.model.*;
 import org.bson.*;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -19,12 +17,8 @@ import static com.mongodb.client.model.Aggregates.unwind;
 public final class MongoUtils {
 
     public static final String MATCH = "$match";
-    public static final String FIRST = "$first";
     public static final String TO_DOUBLE = "$toDouble";
-    public static final String GROUP = "$group";
 
-    public static final String UNWIND = "$unwind";
-    public static final String LOOKUP = "$lookup";
     private static final Map<Class<?>, BiFunction<String, String, BsonValue>> classToMatchId = new HashMap<>();
 
 
@@ -98,28 +92,24 @@ public final class MongoUtils {
 
 
     public static List<Bson> filterForClaims(List<Filter> filters) {
-        List<Bson> pipeline = new ArrayList<>();
+        var pipeline = new ArrayList<Bson>();
 
-        Bson matchStage = aggregateMatch(filters, Claim.class);
+        var matchStage = aggregateMatch(filters, Claim.class);
         pipeline.add(matchStage);
 
         // $lookup and $unwind stages
         Arrays.stream(Claim.class.getDeclaredFields())
                 .filter(field -> field.getType().equals(User.class))
                 .forEach(field -> {
-                    String fieldName = field.getName();
+                    var fieldName = field.getName();
 
-                    BsonDocument lookupStage = bson("$lookup", new BsonDocument()
-                            .append("from", bsonV("user"))
-                            .append("localField", bsonV(fieldName + "._id"))
-                            .append("foreignField", bsonV("_id"))
-                            .append("as", bsonV(fieldName)));
-                    pipeline.add(lookupStage);
+                    // Add lookup stage to the pipeline
+                    pipeline.add(Aggregates.lookup("user", fieldName + "._id", "_id", fieldName));
 
-                    BsonDocument unwindStage = bson("$unwind", new BsonDocument()
-                            .append("path", bsonV("$" + fieldName))
-                            .append("preserveNullAndEmptyArrays", bsonV(true)));
-                    pipeline.add(unwindStage);
+                    var unwindOptions = new UnwindOptions();
+                    unwindOptions.preserveNullAndEmptyArrays(true);
+                    // Add unwind stage to the pipeline
+                    pipeline.add(Aggregates.unwind("$" + fieldName,unwindOptions));
                 });
 
         return pipeline;
