@@ -27,7 +27,6 @@ public class RefreshTokenHandler implements RefreshTokenPersistence {
                 event.getAuthentication() != null &&
                 event.getAuthentication().getName() != null) {
             String payload = event.getRefreshToken();
-            System.out.println("Auth username" + event.getAuthentication().getName() + " Refresh token: " + payload);
             userService.updateToken(event.getAuthentication().getName(), payload);
         }
     }
