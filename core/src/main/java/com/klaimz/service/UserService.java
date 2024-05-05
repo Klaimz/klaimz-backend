@@ -124,17 +124,3 @@ public class UserService {
        return userRepository.findAll();
     }
 }
-/*
-
-QueriesTable: ID, Query, Description
-Metrics: ID, QueryID, MetricName, MetricValue
-
-
- March 2024
- Cloudwatch - Feb 2023
-
-
----- Setup a local splunk
-
-
- */
