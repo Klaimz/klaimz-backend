@@ -24,6 +24,16 @@ public final class Constants {
 
     public static List<String> STATUS_LIST = List.of(STATUS_NEW, STATUS_CM_ASSIGNED, STATUS_EVALUATOR_ASSIGNED, STATUS_EVALUATION_IN_PROGRESS, STATUS_APPROVAL_IN_PROGRESS, STATUS_DENIED, STATUS_APPROVED);
 
+    public static final String FIRST_RUN = "first_run";
+
+    public static final String LAST_RUN = "last_run";
+
+    public static final String CHART_TYPE_PIE = "PIE_CHART";
+    public static final String CHART_TYPE_BAR = "BAR_CHART";
+    public static final String CHART_TYPE_LINE = "LINE_CHART";
+
+
+
 
 
     public static List<FormField> FORM_FIELDS = List.of(

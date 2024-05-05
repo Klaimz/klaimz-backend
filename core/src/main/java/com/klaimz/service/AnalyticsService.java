@@ -10,6 +10,8 @@ import jakarta.inject.Singleton;
 
 import java.util.*;
 
+import static com.klaimz.util.Constants.CHART_TYPE_BAR;
+import static com.klaimz.util.Constants.CHART_TYPE_PIE;
 import static com.klaimz.util.MongoUtils.*;
 
 @Singleton
@@ -22,6 +24,20 @@ public class AnalyticsService {
 
         MongoAggregationOptions aggregationOptions = new MongoAggregationOptions();
 
-        return analyticsRepository.findAll(pipeline, aggregationOptions);
+        var data = analyticsRepository.findAll(pipeline, aggregationOptions);
+
+        return switch (request.getChartType()) {
+            case CHART_TYPE_PIE -> convertToPie(data);
+            default -> data;
+        };
     }
+
+    private List<ChartEntry> convertToPie(List<ChartEntry> data) {
+        var total = data.stream().mapToDouble(ChartEntry::getY).sum();
+        for (var entry : data) {
+            entry.setY((entry.getY() * 100.0) / total);
+        }
+        return data;
+    }
+
 }

@@ -12,4 +12,5 @@ public class ChartAnalyticsRequest {
     private String groupBy;
     private String aggregateBy;
     private String aggregateType;
+    private String chartType;
 }
