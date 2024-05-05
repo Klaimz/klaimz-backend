@@ -1,13 +1,11 @@
 service: klaimz
 frameworkVersion: '3'
 useDotenv: true
-
 params:
   ramvey:
-    ENV: 'ramvey'
+    ENV: ramvey
   dev:
-    ENV: 'dev'
-
+    ENV: dev
 provider:
   name: aws
   environment:
@@ -22,124 +20,119 @@ provider:
     cors:
       allowCredentials: false
       allowedOrigins:
-        - '*'
+      - '*'
       allowedHeaders:
-        - '*'
+      - '*'
   iam:
     role:
       statements:
-        - Effect: "Allow"
-          Action: "*"
-          Resource: "*"
+      - Effect: Allow
+        Action: '*'
+        Resource: '*'
   region: ap-south-1
-
 package:
   individually: true
   exclude:
-    - ./**
-
+  - ./**
 functions:
-    core:
-        handler: io.micronaut.function.aws.proxy.payload2.APIGatewayV2HTTPEventFunction
-        package:
-            artifact: core/build/libs/klaimz-core.jar
-        events:
-        - eventBridge:
-            schedule: rate(4 minutes)
-            input:
-              version: '2.0'
-              routeKey: GET /warmup
-              rawPath: "/warmup"
-              rawQueryString: ''
-              headers:
-                accept: "*/*"
-                accept-encoding: gzip, deflate, br
-                cache-control: no-cache
-                content-length: '0'
-                host: test.execute-api.ap-south-1.amazonaws.com
-                user-agent: CloudWatch-Test-Invoker
-                x-forwarded-port: '443'
-                x-forwarded-proto: https
-              requestContext:
-                accountId: '992382722247'
-                apiId: test
-                domainName: test.execute-api.ap-south-1.amazonaws.com
-                domainPrefix: test
-                http:
-                  method: GET
-                  path: "/warmup"
-                  protocol: HTTP/1.1
-                  sourceIp: 0.0.0.0
-                  userAgent: CloudWatch-Test-Invoker
-                requestId: TbyqliUoBcwEPEg=
-                routeKey: GET /warmup
-                stage: "$default"
-                time: 20/Feb/2024:12:15:25 +0000
-                timeEpoch: 1708431325033
-              isBase64Encoded: false
-        - httpApi:
-            path: /user/login
-            method: post
-        - httpApi:
-            path: /user/signup
-            method: post
-        - httpApi:
-            path: /oauth/access_token
-            method: post
-        - httpApi:
-            path: /user/me
-            method: get
-        - httpApi:
-            path: /user/search
-            method: post
-        - httpApi:
-            path: /user/all
-            method: get
-        - httpApi:
-            path: /warmup
-            method: get
-        - httpApi:
-            path: /claim/all
-            method: get
-        - httpApi:
-            path: /claim/{id}
-            method: get
-        - httpApi:
-            path: /claim
-            method: post
-        - httpApi:
-            path: /claim/{id}
-            method: patch
-        - httpApi:
-            path: /claim/{id}/comment
-            method: post
-        - httpApi:
-            path: /claim/{id}/status
-            method: post
-        - httpApi:
-            path: /claim/search
-            method: post
-        - httpApi:
-            path: /claim/types
-            method: post
-        - httpApi:
-            path: /claim/types
-            method: get
-        - httpApi:
-            path: /claim/{id}/{fieldId}/upload
-            method: post
-        - httpApi:
-            path: /claim/{id}/{fieldId}/download
-            method: get
-        - httpApi:
-            path: /product/{id}
-            method: get
-        - httpApi:
-            path: /product/all
-            method: get
-        - httpApi:
-            path: /product
-            method: post
-        - httpApi:
-            path: /analytics/claim
-            method: post
+  core:
+    handler: io.micronaut.function.aws.proxy.payload2.APIGatewayV2HTTPEventFunction
+    package:
+      artifact: core/build/libs/klaimz-core.jar
+    events:
+    - eventBridge:
+        schedule: rate(4 minutes)
+        input:
+          version: '2.0'
+          routeKey: GET /warmup
+          rawPath: /warmup
+          rawQueryString: ''
+          headers:
+            accept: '*/*'
+            accept-encoding: gzip, deflate, br
+            cache-control: no-cache
+            content-length: '0'
+            host: test.execute-api.ap-south-1.amazonaws.com
+            user-agent: CloudWatch-Test-Invoker
+            x-forwarded-port: '443'
+            x-forwarded-proto: https
+          requestContext:
+            accountId: '992382722247'
+            apiId: test
+            domainName: test.execute-api.ap-south-1.amazonaws.com
+            domainPrefix: test
+            http:
+              method: GET
+              path: /warmup
+              protocol: HTTP/1.1
+              sourceIp: 0.0.0.0
+              userAgent: CloudWatch-Test-Invoker
+            requestId: TbyqliUoBcwEPEg=
+            routeKey: GET /warmup
+            stage: $default
+            time: 20/Feb/2024:12:15:25 +0000
+            timeEpoch: 1708431325033
+          isBase64Encoded: false
+    - httpApi:
+        path: /analytics/claim
+        method: post
+    - httpApi:
+        path: /claim
+        method: post
+    - httpApi:
+        path: /claim/all
+        method: get
+    - httpApi:
+        path: /claim/search
+        method: post
+    - httpApi:
+        path: /claim/types
+        method: post
+    - httpApi:
+        path: /claim/types
+        method: get
+    - httpApi:
+        path: /claim/{id}
+        method: get
+    - httpApi:
+        path: /claim/{id}
+        method: patch
+    - httpApi:
+        path: /claim/{id}/comment
+        method: post
+    - httpApi:
+        path: /claim/{id}/status
+        method: post
+    - httpApi:
+        path: /claim/{id}/{fieldKey}/download
+        method: get
+    - httpApi:
+        path: /claim/{id}/{fieldKey}/upload
+        method: post
+    - httpApi:
+        path: /product
+        method: post
+    - httpApi:
+        path: /product/all
+        method: get
+    - httpApi:
+        path: /product/{id}
+        method: get
+    - httpApi:
+        path: /user/all
+        method: get
+    - httpApi:
+        path: /user/me
+        method: get
+    - httpApi:
+        path: /user/search
+        method: post
+    - httpApi:
+        path: /user/signup
+        method: post
+    - httpApi:
+        path: /user/{id}
+        method: get
+    - httpApi:
+        path: /warmup
+        method: get

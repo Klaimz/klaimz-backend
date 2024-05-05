@@ -1,3 +1,11 @@
+import org.yaml.snakeyaml.*;
+
+buildscript {
+    dependencies {
+        classpath 'org.yaml:snakeyaml:2.2'
+    }
+}
+
 plugins {
     id("com.github.johnrengelman.shadow")
     id("io.micronaut.application") version "$micronautVersion"
@@ -17,9 +25,9 @@ configurations {
 }
 
 tasks.register('runLocal', JavaExec) {
-    def stage =  System.getenv("STAGE") ?: "local"
+    def stage = System.getenv("STAGE") ?: "local"
     def env = new HashMap<String, String>()
-    def envFile = file("../.env."+stage)
+    def envFile = file("../.env." + stage)
     def properties = new Properties()
     properties.load(envFile.newDataInputStream())
 
@@ -32,7 +40,7 @@ tasks.register('runLocal', JavaExec) {
     args("--micronaut.runtime=netty")
 }
 
-shadowJar{
+shadowJar {
     archiveBaseName.set('klaimz-core')
     archiveClassifier.set('')
     archiveVersion.set('')
@@ -124,5 +132,44 @@ tasks.named("dockerfileNative") {
     )
 }
 
+tasks.register('generateServerlessPaths') {
+    def openApiFile = new File('core/openapi_klaimz.yml')
+    def serverlessFile = new File('serverless.yml')
+
+    def openApiContent = new Yaml().load(openApiFile.text)
+    def serverlessContent = new Yaml().load(serverlessFile.text)
+    def eventMap = new HashMap<String, String>()
+
+    serverlessContent.functions.core.events.each { event ->
+        def key = "eventBridge"
+        if (event.httpApi != null) {
+            key = event.httpApi.path + ":" + event.httpApi.method
+        }
+        eventMap.put(key, event)
+    }
+
+    openApiContent.paths.each { path, methods ->
+        methods.each { method, details ->
+            def newEntry = [
+                    httpApi: [
+                            path  : path,
+                            method: method
+                    ]
+            ]
+            def key = path + ":" + method
+            eventMap.put(key, newEntry)
+        }
+    }
+
+    serverlessContent.functions.core.events = eventMap.values()
+            .sort { it.httpApi?.path ?: "/0" }.collect()
+
+    def options = new DumperOptions();
+    options.setIndent(2);
+    options.setPrettyFlow(true);
+    options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+
+    serverlessFile.text = new Yaml(options).dump(serverlessContent)
+}
 
 

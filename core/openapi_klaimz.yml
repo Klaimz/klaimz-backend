@@ -342,7 +342,7 @@ paths:
           content:
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/MessageBean'
 components:
   schemas:
     ChartAnalyticsRequest:
@@ -357,6 +357,8 @@ components:
         aggregate-by:
           type: string
         aggregate-type:
+          type: string
+        chart-type:
           type: string
     Claim:
       required:
