@@ -4,9 +4,11 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
+        classpath 'com.bmuschko:gradle-docker-plugin:9.4.0'
         classpath 'com.github.johnrengelman:shadow:8.1.1'
     }
 }
 
 rootProject.name = 'klaimz-backend'
 include 'core'
+include 'authorizer'

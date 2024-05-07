@@ -1,0 +1,81 @@
+plugins {
+    id("com.github.johnrengelman.shadow")
+    id("io.micronaut.application") version "$micronautVersion"
+    id("io.micronaut.aot") version "$micronautVersion"
+    id 'java'
+}
+
+
+group = 'com.klaimz'
+version = '1.0'
+
+application {
+    mainClass.set("com.klaimz.authorizer.Application")
+}
+shadowJar {
+    archiveBaseName.set('klaimz-authorizer')
+    archiveClassifier.set('')
+    archiveVersion.set('')
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs = [
+            '-parameters'
+    ]
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+    targetCompatibility = JavaVersion.toVersion("17")
+}
+
+
+graalvmNative.toolchainDetection = false
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+
+
+    implementation("io.micronaut.aws:micronaut-aws-sdk-v2")
+    implementation("io.micronaut.aws:micronaut-aws-lambda-events-serde")
+    implementation("io.micronaut.aws:micronaut-function-aws")
+    implementation("io.micronaut.aws:micronaut-function-client-aws")
+    annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
+    implementation 'io.micronaut.serde:micronaut-serde-jackson'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-joda'
+
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+
+micronaut {
+    runtime("lambda_java")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("com.klaimz.*")
+    }
+}
+
+tasks.named("dockerfileNative") {
+    baseImage = "amazonlinux:2"
+    jdkVersion = "17"
+    args(
+            "-XX:MaximumHeapSizePercent=80",
+            "-Dio.netty.allocator.numDirectArenas=0",
+            "-Dio.netty.noPreferDirect=true"
+    )
+}
