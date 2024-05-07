@@ -1,6 +1,43 @@
 service: klaimz
 frameworkVersion: '3'
 useDotenv: true
+
+custom:
+  warmup:
+    schedule: rate(4 minutes)
+    input:
+      version: '2.0'
+      routeKey: GET /warmup
+      rawPath: /warmup
+      rawQueryString: ''
+      headers:
+        accept: '*/*'
+        accept-encoding: gzip, deflate, br
+        cache-control: no-cache
+        content-length: '0'
+        host: test.execute-api.ap-south-1.amazonaws.com
+        user-agent: CloudWatch-Test-Invoker
+        x-forwarded-port: '443'
+        x-forwarded-proto: https
+      requestContext:
+        accountId: '992382722247'
+        apiId: test
+        domainName: test.execute-api.ap-south-1.amazonaws.com
+        domainPrefix: test
+        http:
+          method: GET
+          path: /warmup
+          protocol: HTTP/1.1
+          sourceIp: 0.0.0.0
+          userAgent: CloudWatch-Test-Invoker
+        requestId: TbyqliUoBcwEPEg=
+        routeKey: GET /warmup
+        stage: $default
+        time: 20/Feb/2024:12:15:25 +0000
+        timeEpoch: 1708431325033
+      isBase64Encoded: false
+
+
 params:
   ramvey:
     ENV: ramvey
@@ -38,7 +75,7 @@ functions:
   authorizer:
     handler: com.klaimz.authorizer.AuthorizerHandler
     events:
-    - eventBridge: ${file(warmup_event.yml)}
+    - eventBridge: ${self:custom.warmup}
     environment:
       CORE_FUNCTION_NAME: ${self:service}-${param:ENV}-core
     package:
@@ -48,7 +85,7 @@ functions:
     package:
       artifact: core/build/libs/klaimz-core.jar
     events:
-    - eventBridge: ${file(warmup_event.yml)}
+    - eventBridge: ${self:custom.warmup}
     - httpApi:
         path: /analytics/claim
         method: post

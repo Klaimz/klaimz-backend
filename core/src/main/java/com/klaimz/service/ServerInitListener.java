@@ -27,20 +27,7 @@ public class ServerInitListener implements ApplicationEventListener<StartupEvent
     @Override
     public void onApplicationEvent(StartupEvent event) {
 //            don't do anything here, single it can slow down a startup in Lambda
-        var user = new UserSignUp();
-        user.setDisplayName("MeghAdmin");
-        user.setPhone("TEST");
-        user.setAddress("TEST");
-        user.setEmail("smart_admin@klaimz.com");
-        user.setPassword("klaimz");
-        user.setRoles(List.of("Admin"));
-        user.setRegion("India");
-        try {
-            userService.createUser(user);
-            System.out.println("DOne ");
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+
     }
 
     @Override
