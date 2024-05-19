@@ -21,6 +21,7 @@ public final class MongoUtils {
     private static final Map<Class<?>, BiFunction<String, String, BsonValue>> classToMatchId = new HashMap<>();
     public static final String X = "x";
     public static final String Y = "y";
+    public static final List<String> userIdList = List.of("evaluator._id", "requester._id", "claimManager._id");
 
 
     static {
@@ -66,8 +67,14 @@ public final class MongoUtils {
     }
 
     public static Bson group(ChartAnalyticsRequest request) {
-        String groupBy = "$" + request.getGroupBy();
-        Bson aggregateBy = bson(TO_DOUBLE, bsonV("$" + request.getAggregateBy()));
+        var groupBy = bsonV("$" + request.getGroupBy());
+
+        if (userIdList.contains(request.getGroupBy())) {
+            // if the group by field is a user id, convert the object ID to string
+            groupBy = bson("$toString", bsonV("$" + request.getGroupBy()));
+        }
+
+        var aggregateBy = bson(TO_DOUBLE, bsonV("$" + request.getAggregateBy()));
 
 
         var accumulators = new ArrayList<BsonField>();
@@ -86,9 +93,8 @@ public final class MongoUtils {
     }
 
     public static BsonValue matchIdClaim(String field, String value) {
-        var idList = List.of("evaluator._id", "requester._id", "claimManager._id");
 
-        if (idList.contains(field)) {
+        if (userIdList.contains(field)) {
             return new BsonObjectId(new ObjectId(value));
         }
         return new BsonString(value);

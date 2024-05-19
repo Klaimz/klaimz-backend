@@ -35,7 +35,8 @@ public class AnalyticsService {
     private List<ChartEntry> convertToPie(List<ChartEntry> data) {
         var total = data.stream().mapToDouble(ChartEntry::getY).sum();
         for (var entry : data) {
-            entry.setY((entry.getY() * 100.0) / total);
+            double yRounded = Math.round(entry.getY() * 10000.0 / total) / 100.0;
+            entry.setY(yRounded);
         }
         return data;
     }
