@@ -1,7 +1,6 @@
 service: klaimz
 frameworkVersion: '3'
 useDotenv: true
-
 custom:
   warmup:
     schedule: rate(4 minutes)
@@ -36,8 +35,6 @@ custom:
         time: 20/Feb/2024:12:15:25 +0000
         timeEpoch: 1708431325033
       isBase64Encoded: false
-
-
 params:
   ramvey:
     ENV: ramvey

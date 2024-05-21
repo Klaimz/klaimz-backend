@@ -21,7 +21,11 @@ public final class MongoUtils {
     private static final Map<Class<?>, BiFunction<String, String, BsonValue>> classToMatchId = new HashMap<>();
     public static final String X = "x";
     public static final String Y = "y";
-    public static final List<String> userIdList = List.of("evaluator._id", "requester._id", "claimManager._id");
+    public static final List<String> userFields = Arrays
+            .stream(Claim.class.getDeclaredFields())
+            .filter(field -> field.getType().equals(User.class))
+            .map(field -> field.getName())
+            .toList();
 
 
     static {
@@ -69,7 +73,7 @@ public final class MongoUtils {
     public static Bson group(ChartAnalyticsRequest request) {
         var groupBy = bsonV("$" + request.getGroupBy());
 
-        if (userIdList.contains(request.getGroupBy())) {
+        if (isOfUser(request.getGroupBy()) && request.getGroupBy().contains("._id")) {
             // if the group by field is a user id, convert the object ID to string
             groupBy = bson("$toString", bsonV("$" + request.getGroupBy()));
         }
@@ -94,10 +98,21 @@ public final class MongoUtils {
 
     public static BsonValue matchIdClaim(String field, String value) {
 
-        if (userIdList.contains(field)) {
+        if (isOfUser(field) && field.contains("._id")) {
             return new BsonObjectId(new ObjectId(value));
         }
         return new BsonString(value);
+    }
+
+    public static boolean isOfUser(String matchField) {
+        return userFields.stream().anyMatch(matchField::contains);
+    }
+
+    public static String getFieldFromUser(String matchField) {
+        return userFields.stream()
+                .filter(matchField::contains)
+                .findAny()
+                .orElse(null);
     }
 
 
@@ -109,23 +124,25 @@ public final class MongoUtils {
     public static List<Bson> filterForClaims(List<Filter> filters) {
         var pipeline = new ArrayList<Bson>();
 
-        var matchStage = aggregateMatch(filters, Claim.class);
-        pipeline.add(matchStage);
-
         // $lookup and $unwind stages
         Arrays.stream(Claim.class.getDeclaredFields())
                 .filter(field -> field.getType().equals(User.class))
-                .forEach(field -> {
-                    var fieldName = field.getName();
+                .forEach(field -> pipeline.addAll(userJoinPipelineSteps(field.getName())));
 
-                    // Add lookup stage to the pipeline
-                    pipeline.add(Aggregates.lookup("user", fieldName + "._id", "_id", fieldName));
+        var matchStage = aggregateMatch(filters, Claim.class);  // match stage should be the last stage!
+        pipeline.add(matchStage);
 
-                    var unwindOptions = new UnwindOptions();
-                    unwindOptions.preserveNullAndEmptyArrays(true);
-                    // Add unwind stage to the pipeline
-                    pipeline.add(Aggregates.unwind("$" + fieldName, unwindOptions));
-                });
+        return pipeline;
+    }
+
+    public static List<Bson> userJoinPipelineSteps(String fieldName) {
+        var pipeline = new ArrayList<Bson>();
+        pipeline.add(Aggregates.lookup("user", fieldName + "._id", "_id", fieldName));
+
+        var unwindOptions = new UnwindOptions();
+        unwindOptions.preserveNullAndEmptyArrays(true);
+        // Add unwind stage to the pipeline
+        pipeline.add(Aggregates.unwind("$" + fieldName, unwindOptions));
 
         return pipeline;
     }
@@ -137,6 +154,12 @@ public final class MongoUtils {
                 .filter(filters -> !filters.isEmpty())
                 .ifPresent(filters -> pipeline.add(aggregateMatch(filters, Claim.class)));
 
+
+        // If the groupBy field is user field like 'requester.displayName', add a $lookup stage to join with the User collection
+        if (isOfUser(request.getGroupBy())) {
+            var field = getFieldFromUser(request.getGroupBy());
+            pipeline.addAll(userJoinPipelineSteps(field));
+        }
 
         if (request.getGroupBy().startsWith("products.")) {
             pipeline.add(unwind("$products"));
