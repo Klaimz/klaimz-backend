@@ -149,12 +149,6 @@ public final class MongoUtils {
 
     public static ArrayList<Bson> createAnalyticsPipeline(ChartAnalyticsRequest request) {
         var pipeline = new ArrayList<Bson>();
-
-        Optional.ofNullable(request.getFilters())
-                .filter(filters -> !filters.isEmpty())
-                .ifPresent(filters -> pipeline.add(aggregateMatch(filters, Claim.class)));
-
-
         // If the groupBy field is user field like 'requester.displayName', add a $lookup stage to join with the User collection
         if (isOfUser(request.getGroupBy())) {
             var field = getFieldFromUser(request.getGroupBy());
@@ -164,6 +158,10 @@ public final class MongoUtils {
         if (request.getGroupBy().startsWith("products.")) {
             pipeline.add(unwind("$products"));
         }
+
+        Optional.ofNullable(request.getFilters())
+                .filter(filters -> !filters.isEmpty())
+                .ifPresent(filters -> pipeline.add(aggregateMatch(filters, Claim.class)));
 
         pipeline.add(group(request));
         return pipeline;
