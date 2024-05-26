@@ -13,7 +13,6 @@ import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.security.annotation.Secured;
 import jakarta.inject.Inject;
 
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 import static com.klaimz.util.HttpUtils.success;

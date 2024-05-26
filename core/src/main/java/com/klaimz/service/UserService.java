@@ -64,6 +64,14 @@ public class UserService {
             }
         }
 
+        userRepository.findByEmail(signUp.getEmail()).ifPresent(user -> {
+            throw new IllegalArgumentException("User with email already exists");
+        });
+
+        loginRepository.findByEmail(signUp.getEmail()).ifPresent(user -> {
+            throw new IllegalArgumentException("User with email already exists");
+        });
+
         var createdUser = userRepository.save(signUp.convertToUser());
 
         loginRepository.save(LoginData.builder()
