@@ -26,8 +26,8 @@ public final class StringUtils {
     }
 
     // check if string is currency
-    public static boolean isCurrency(String str) {
-        return str.matches("^[0-9]+(\\.[0-9]{1,2})?$");
+    public static boolean isCurrency(double currency) {
+        return Double.toString(currency).matches("^[0-9]+(\\.[0-9]{1,2})?$");
     }
 
 }

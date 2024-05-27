@@ -1,16 +1,20 @@
 package com.klaimz.util;
 
 import com.klaimz.model.Claim;
+import com.klaimz.model.FilterableRequest;
 import com.klaimz.model.User;
 import com.klaimz.model.api.ChartAnalyticsRequest;
 import com.klaimz.model.api.Filter;
+import com.klaimz.model.api.TopKClaimRequest;
 import com.mongodb.client.model.*;
 import org.bson.*;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Aggregates.unwind;
 
@@ -21,10 +25,10 @@ public final class MongoUtils {
     private static final Map<Class<?>, BiFunction<String, String, BsonValue>> classToMatchId = new HashMap<>();
     public static final String X = "x";
     public static final String Y = "y";
-    public static final List<String> userFields = Arrays
+    public static final List<String> USER_FIELDS = Arrays
             .stream(Claim.class.getDeclaredFields())
             .filter(field -> field.getType().equals(User.class))
-            .map(field -> field.getName())
+            .map(Field::getName)
             .toList();
 
 
@@ -73,7 +77,7 @@ public final class MongoUtils {
     public static Bson group(ChartAnalyticsRequest request) {
         var groupBy = bsonV("$" + request.getGroupBy());
 
-        if (isOfUser(request.getGroupBy()) && request.getGroupBy().contains("._id")) {
+        if (isOfUser(List.of(request.getGroupBy())) && request.getGroupBy().contains("._id")) {
             // if the group by field is a user id, convert the object ID to string
             groupBy = bson("$toString", bsonV("$" + request.getGroupBy()));
         }
@@ -98,21 +102,24 @@ public final class MongoUtils {
 
     public static BsonValue matchIdClaim(String field, String value) {
 
-        if (isOfUser(field) && field.contains("._id")) {
+        if (isOfUser(List.of(field)) && field.contains("._id")) {
             return new BsonObjectId(new ObjectId(value));
         }
         return new BsonString(value);
     }
 
-    public static boolean isOfUser(String matchField) {
-        return userFields.stream().anyMatch(matchField::contains);
+    public static boolean isOfUser(List<String> matchField) {
+        return USER_FIELDS.stream()
+                .anyMatch(field -> matchField.stream().
+                        anyMatch(field::contains));
     }
 
-    public static String getFieldFromUser(String matchField) {
-        return userFields.stream()
-                .filter(matchField::contains)
-                .findAny()
-                .orElse(null);
+    public static List<String> findUserFields(List<String> matchField) {
+        return matchField.stream()
+                .map(field -> USER_FIELDS.stream().filter(field::contains).findAny())
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
     }
 
 
@@ -147,23 +154,56 @@ public final class MongoUtils {
         return pipeline;
     }
 
-    public static ArrayList<Bson> createAnalyticsPipeline(ChartAnalyticsRequest request) {
-        var pipeline = new ArrayList<Bson>();
-        // If the groupBy field is user field like 'requester.displayName', add a $lookup stage to join with the User collection
-        if (isOfUser(request.getGroupBy())) {
-            var field = getFieldFromUser(request.getGroupBy());
-            pipeline.addAll(userJoinPipelineSteps(field));
+    private static ArrayList<Bson> createFilterablePipeline(FilterableRequest request) {
+        if (request.getFilters() == null || request.getFilters().isEmpty()) {
+            return new ArrayList<>();
         }
 
-        if (request.getGroupBy().startsWith("products.")) {
+        var filterFields = request.getFilters()
+                .stream().map(Filter::getField)
+                .toList();
+
+        var userFilterFields = findUserFields(filterFields);
+        var pipeline = userFilterFields.stream()
+                .map(MongoUtils::userJoinPipelineSteps)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        var containsProducts = filterFields.stream()
+                .anyMatch(field -> field.startsWith("products."));
+
+        if (containsProducts) {
             pipeline.add(unwind("$products"));
         }
 
-        Optional.ofNullable(request.getFilters())
-                .filter(filters -> !filters.isEmpty())
-                .ifPresent(filters -> pipeline.add(aggregateMatch(filters, Claim.class)));
+        pipeline.add(aggregateMatch(request.getFilters(), Claim.class));
+        return pipeline;
+    }
 
+    public static ArrayList<Bson> createAnalyticsPipeline(ChartAnalyticsRequest request) {
+        var pipeline = createFilterablePipeline(request);
         pipeline.add(group(request));
+
+        return pipeline;
+    }
+
+    public static ArrayList<Bson> createGetTopKClaimsPipeline(TopKClaimRequest request) {
+        var pipeline = createFilterablePipeline(request);
+
+        // Add a sort stage to the pipeline
+        pipeline.add(Aggregates.sort(Sorts.descending(request.getSortBy())));
+
+        // Add a limit stage to the pipeline
+        pipeline.add(Aggregates.limit(request.getLimit()));
+
+        // create a projection stage to project the target field and the sortBy field into the ChartEntry model
+        var projection = new BsonDocument();
+        projection.append("_id", new BsonString("$" + request.getTarget()));
+        projection.append(X, bsonV("$" + request.getTarget()));
+        projection.append(Y, bson(TO_DOUBLE, bsonV("$" + request.getSortBy())));
+
+        pipeline.add(Aggregates.project(projection));
+
         return pipeline;
     }
 }

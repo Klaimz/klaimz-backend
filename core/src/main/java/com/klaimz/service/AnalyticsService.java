@@ -3,10 +3,12 @@ package com.klaimz.service;
 
 import com.klaimz.model.ChartEntry;
 import com.klaimz.model.api.ChartAnalyticsRequest;
+import com.klaimz.model.api.TopKClaimRequest;
 import com.klaimz.repo.AnalyticsRepository;
 import io.micronaut.data.mongodb.operations.options.MongoAggregationOptions;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.bson.conversions.Bson;
 
 import java.util.*;
 
@@ -41,4 +43,13 @@ public class AnalyticsService {
         return data;
     }
 
+    public List<ChartEntry> getTopKClaims(TopKClaimRequest request) {
+        var pipeline = createGetTopKClaimsPipeline(request);
+
+        System.out.println(pipeline);
+
+        MongoAggregationOptions aggregationOptions = new MongoAggregationOptions();
+
+        return analyticsRepository.findAll(pipeline, aggregationOptions);
+    }
 }

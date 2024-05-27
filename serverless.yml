@@ -87,6 +87,9 @@ functions:
         path: /analytics/claim
         method: post
     - httpApi:
+        path: /analytics/top
+        method: post
+    - httpApi:
         path: /claim
         method: post
     - httpApi:

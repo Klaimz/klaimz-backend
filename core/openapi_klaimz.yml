@@ -21,6 +21,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageBean'
+  /analytics/top:
+    post:
+      operationId: getTopAnalytics
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TopKClaimRequest'
+        required: true
+      responses:
+        "200":
+          description: getTopAnalytics 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageBean'
   /claim:
     post:
       operationId: createClaim
@@ -379,7 +395,8 @@ components:
         id:
           type: string
         amount:
-          type: string
+          type: number
+          format: double
         created-date:
           type: string
           format: date-time
@@ -520,6 +537,20 @@ components:
         gst-percentage:
           type: number
           format: double
+    TopKClaimRequest:
+      type: object
+      properties:
+        filters:
+          type: array
+          items:
+            $ref: '#/components/schemas/Filter'
+        target:
+          type: string
+        sort-by:
+          type: string
+        limit:
+          type: integer
+          format: int32
     User:
       required:
       - active

@@ -21,7 +21,7 @@ public class Claim {
     @Id
     @GeneratedValue
     private String id;
-    private String amount;
+    private double amount;
 
     @DateCreated
     private Date createdDate;

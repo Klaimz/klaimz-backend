@@ -6,12 +6,12 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+
 @Data
 @NoArgsConstructor
-public class ChartAnalyticsRequest implements FilterableRequest {
+public class TopKClaimRequest implements FilterableRequest {
     private List<Filter> filters;
-    private String groupBy;
-    private String aggregateBy;
-    private String aggregateType;
-    private String chartType;
+    private String target;
+    private String sortBy;
+    private int limit;
 }

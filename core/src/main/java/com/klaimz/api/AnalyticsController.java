@@ -2,6 +2,7 @@ package com.klaimz.api;
 
 
 import com.klaimz.model.api.ChartAnalyticsRequest;
+import com.klaimz.model.api.TopKClaimRequest;
 import com.klaimz.model.http.MessageBean;
 import com.klaimz.service.AnalyticsService;
 import io.micronaut.http.HttpResponse;
@@ -26,9 +27,14 @@ public class AnalyticsController {
 
     @Post("/claim")
     public HttpResponse<MessageBean> getClaimAnalytics(@Body ChartAnalyticsRequest request) {
-
         var result = analyticsService.getChartAnalytics(request);
         return success(result, "Claim analytics fetched");
+    }
+
+    @Post("/top")
+    public HttpResponse<MessageBean> getTopAnalytics(@Body TopKClaimRequest request) {
+        var result = analyticsService.getTopKClaims(request);
+        return success(result, "Top K records fetched");
     }
 
 }
