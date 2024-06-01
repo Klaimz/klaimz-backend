@@ -91,17 +91,11 @@ public class Claim {
         @Positive(message = "Product must have a valid quantity")
         private int quantity;
 
-        @Positive(message = "Product must have a valid mrp")
         private double mrp;
 
-
-        @NotBlank(message = "Product must have a valid name")
         private String name;
         private String uid;
 
-
-        @Positive(message = "Product must have a valid GST percentage")
-        @DecimalMax(value = "28", message = "Product GST percentage must be between 1 and 28")
         private double gstPercentage;
     }
 

@@ -17,6 +17,8 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
+import static com.mongodb.client.model.Aggregates.unwind;
+
 public final class MongoUtils {
 
     public static final String TO_DOUBLE = "$toDouble";
@@ -162,7 +164,7 @@ public final class MongoUtils {
         var unwindOptions = new UnwindOptions();
         unwindOptions.preserveNullAndEmptyArrays(true);
         // Add unwind stage to the pipeline
-        pipeline.add(Aggregates.unwind("$" + fieldName, unwindOptions));
+        pipeline.add(unwind("$" + fieldName, unwindOptions));
 
         return pipeline;
     }
@@ -189,6 +191,10 @@ public final class MongoUtils {
 
     public static ArrayList<Bson> createAnalyticsPipeline(ChartAnalyticsRequest request) {
         var pipeline = createFilterablePipeline(request);
+        if (request.getGroupBy().startsWith("products.")) {
+            // Add unwind stage to the pipeline
+            pipeline.add(unwind("$products"));
+        }
         pipeline.add(group(request));
 
         return pipeline;

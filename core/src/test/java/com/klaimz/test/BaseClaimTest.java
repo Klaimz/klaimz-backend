@@ -83,7 +83,7 @@ public abstract class BaseClaimTest {
         return Product.builder()
                 .name("Random Product " + random.nextInt(1000))
                 .uid("RP" + random.nextInt(1000))
-                .gstPercentage((random.nextDouble() * 28)+5)
+                .gstPercentage((random.nextDouble() * 20)+7)
                 .mrp(random.nextDouble() * 100)
                 .build();
     }
