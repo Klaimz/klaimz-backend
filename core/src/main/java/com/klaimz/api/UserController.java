@@ -13,6 +13,7 @@ import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.security.annotation.Secured;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 
 import java.security.Principal;
 
@@ -59,7 +60,7 @@ public class UserController {
     }
 
     @Post("/search")
-    public HttpResponse<MessageBean> search(@Body Filter filter) {
+    public HttpResponse<MessageBean> search(@Valid @Body Filter filter) {
         var result = userService.findByField(filter);
 
         return success(result, "User search result");

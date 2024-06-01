@@ -8,6 +8,7 @@ import com.klaimz.repo.AnalyticsRepository;
 import io.micronaut.data.mongodb.operations.options.MongoAggregationOptions;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import jakarta.validation.Valid;
 
 import java.util.*;
 
@@ -19,7 +20,11 @@ public class AnalyticsService {
     @Inject
     AnalyticsRepository analyticsRepository;
 
-    public List<ChartEntry> getChartAnalytics(ChartAnalyticsRequest request) {
+    public List<ChartEntry> getChartAnalytics(@Valid ChartAnalyticsRequest request) {
+        if (request.getFields().isEmpty()){
+            return Collections.emptyList();
+        }
+
         var pipeline = createAnalyticsPipeline(request);
 
         MongoAggregationOptions aggregationOptions = new MongoAggregationOptions();
@@ -32,7 +37,11 @@ public class AnalyticsService {
         };
     }
 
-    public List<ChartEntry> getTopKClaims(TopKClaimRequest request) {
+    public List<ChartEntry> getTopKClaims(@Valid TopKClaimRequest request) {
+        if (request.getFields().isEmpty()) {
+            return Collections.emptyList();
+        }
+
         var pipeline = createGetTopKClaimsPipeline(request);
 
         MongoAggregationOptions aggregationOptions = new MongoAggregationOptions();

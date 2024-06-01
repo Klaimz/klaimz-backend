@@ -12,6 +12,7 @@ import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.security.annotation.Secured;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 
 import java.security.NoSuchAlgorithmException;
 
@@ -29,7 +30,7 @@ public class SignUpController {
     private UserService userService;
 
     @Post
-    public HttpResponse<MessageBean> registerUser(@Body UserSignUp userSignUp) throws NoSuchAlgorithmException {
+    public HttpResponse<MessageBean> registerUser(@Valid @Body UserSignUp userSignUp) throws NoSuchAlgorithmException {
         var user = userService.createUser(userSignUp);
         if (user == null) {
             return HttpUtils.badRequest("Unable to signup user");

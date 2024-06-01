@@ -6,6 +6,7 @@ import com.klaimz.repo.ProductRepository;
 import com.klaimz.util.EntityValidators;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -19,8 +20,7 @@ public class ProductService {
     private EntityValidators entityValidators;
 
 
-    public Product createProduct(Product product) {
-        entityValidators.validateProduct(product);
+    public Product createProduct(@Valid Product product) {
         return productRepository.save(product);
     }
 

@@ -114,6 +114,7 @@ paths:
         in: path
         required: true
         schema:
+          minLength: 1
           type: string
       responses:
         "200":
@@ -151,6 +152,7 @@ paths:
         in: path
         required: true
         schema:
+          minLength: 1
           type: string
       requestBody:
         content:
@@ -195,16 +197,19 @@ paths:
         in: path
         required: true
         schema:
+          minLength: 1
           type: string
       - name: id
         in: path
         required: true
         schema:
+          minLength: 1
           type: string
       - name: file
         in: query
         required: true
         schema:
+          minLength: 1
           type: string
       responses:
         "200":
@@ -221,16 +226,19 @@ paths:
         in: path
         required: true
         schema:
+          minLength: 1
           type: string
       - name: id
         in: path
         required: true
         schema:
+          minLength: 1
           type: string
       - name: file
         in: query
         required: true
         schema:
+          minLength: 1
           type: string
       responses:
         "200":
@@ -273,6 +281,7 @@ paths:
         in: path
         required: true
         schema:
+          minLength: 1
           type: string
       responses:
         "200":
@@ -362,6 +371,11 @@ paths:
 components:
   schemas:
     ChartAnalyticsRequest:
+      required:
+      - aggregate-by
+      - aggregate-type
+      - chart-type
+      - group-by
       type: object
       properties:
         fields:
@@ -373,12 +387,16 @@ components:
           items:
             $ref: '#/components/schemas/Filter'
         group-by:
+          minLength: 1
           type: string
         aggregate-by:
+          minLength: 1
           type: string
         aggregate-type:
+          minLength: 1
           type: string
         chart-type:
+          minLength: 1
           type: string
     Claim:
       required:
@@ -399,18 +417,22 @@ components:
         id:
           type: string
         amount:
+          minimum: 0
           type: number
           format: double
         created-date:
           type: string
           format: date-time
         status:
+          minLength: 1
           type: string
         products:
+          minItems: 1
           type: array
           items:
             $ref: '#/components/schemas/Claim.ProductDTO'
         fields:
+          minItems: 1
           type: array
           items:
             $ref: '#/components/schemas/Claim.FormFieldValue'
@@ -434,6 +456,7 @@ components:
           items:
             $ref: '#/components/schemas/Claim.ClaimUpdate'
         claim-template-id:
+          minLength: 1
           type: string
     Claim.ClaimUpdate:
       required:
@@ -469,8 +492,10 @@ components:
       type: object
       properties:
         key:
+          minLength: 1
           type: string
         type:
+          minLength: 1
           type: string
         value:
           type: string
@@ -486,20 +511,27 @@ components:
       type: object
       properties:
         id:
+          minLength: 1
           type: string
         description:
+          minLength: 1
           type: string
         quantity:
+          minimum: 0
           type: integer
           format: int32
         mrp:
+          minimum: 0
           type: number
           format: double
         name:
+          minLength: 1
           type: string
         uid:
           type: string
         gst-percentage:
+          maximum: 28
+          minimum: 0
           type: number
           format: double
     ClaimType:
@@ -511,18 +543,27 @@ components:
         id:
           type: string
         type-name:
+          minLength: 1
           type: string
     Filter:
+      required:
+      - field
+      - value
       type: object
       properties:
         field:
+          minLength: 1
           type: string
         value:
+          minLength: 1
           type: string
     GenericDto:
+      required:
+      - body
       type: object
       properties:
         body:
+          minLength: 1
           type: string
     MessageBean:
       type: object
@@ -544,16 +585,24 @@ components:
         id:
           type: string
         mrp:
+          minimum: 0
           type: number
           format: double
         name:
+          minLength: 1
           type: string
         uid:
+          minLength: 1
           type: string
         gst-percentage:
+          maximum: 28
+          minimum: 0
           type: number
           format: double
     TopKClaimRequest:
+      required:
+      - sort-by
+      - target
       type: object
       properties:
         fields:
@@ -565,10 +614,13 @@ components:
           items:
             $ref: '#/components/schemas/Filter'
         target:
+          minLength: 1
           type: string
         sort-by:
+          minLength: 1
           type: string
         limit:
+          minimum: 0
           type: integer
           format: int32
     User:
@@ -593,11 +645,14 @@ components:
           type: string
         email:
           type: string
+          format: email
         phone:
           type: string
         company-name:
+          minLength: 1
           type: string
         address:
+          minLength: 1
           type: string
         gst-number:
           type: string
@@ -612,6 +667,7 @@ components:
         active:
           type: boolean
         roles:
+          minItems: 1
           type: array
           items:
             type: string
@@ -619,6 +675,9 @@ components:
       type: object
       allOf:
       - $ref: '#/components/schemas/User'
-      - properties:
+      - required:
+        - password
+        properties:
           password:
+            minLength: 1
             type: string

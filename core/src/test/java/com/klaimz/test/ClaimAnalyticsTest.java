@@ -10,6 +10,7 @@ import com.klaimz.service.AnalyticsService;
 import com.klaimz.service.ClaimService;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import jakarta.validation.ConstraintViolationException;
 import lombok.Getter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,8 +22,7 @@ import java.util.List;
 import static com.klaimz.util.Constants.*;
 import static com.klaimz.util.MongoUtils.convertToPie;
 import static java.util.stream.Collectors.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @MicronautTest(startApplication = false, environments = "awesome")
@@ -117,7 +117,6 @@ public class ClaimAnalyticsTest extends BaseClaimTest {
 
     @Test
     public void testChartAnalyticsRequesterStatusVsAmount() {
-        System.out.println("Testid "+this.testDataContainer.getId());
         String displayName = this.testDataContainer.getUsers().get(0).getDisplayName();
         // Create a ChartAnalyticsRequest object
         ChartAnalyticsRequest request = new ChartAnalyticsRequest();
@@ -163,7 +162,6 @@ public class ClaimAnalyticsTest extends BaseClaimTest {
 
     @Test
     public void testChartAnalyticsRequesterDisplayNameVsAmount() {
-        System.out.println("Testid "+this.testDataContainer.getId());
 
         // Create a ChartAnalyticsRequest object
         ChartAnalyticsRequest request = new ChartAnalyticsRequest();
@@ -208,9 +206,6 @@ public class ClaimAnalyticsTest extends BaseClaimTest {
 
     @Test
     public void testChartAnalyticsRequesterVsAmount() {
-
-        System.out.println("Testid "+this.testDataContainer.getId());
-
         String productName = this.testDataContainer.getProducts().get(0).getName();
 
         // Create a ChartAnalyticsRequest object
@@ -259,8 +254,6 @@ public class ClaimAnalyticsTest extends BaseClaimTest {
 
     @Test
     public void testChartAnalyticsRequesterVsMinAmount() {
-        System.out.println("Testid "+this.testDataContainer.getId());
-
         String productName = this.testDataContainer.getProducts().get(0).getName();
 
         // Create a ChartAnalyticsRequest object
@@ -276,7 +269,6 @@ public class ClaimAnalyticsTest extends BaseClaimTest {
 
         // Call the getChartAnalytics method
         List<ChartEntry> result = analyticsService.getChartAnalytics(request);
-
 
 
         // Verify that the percentages sum up to 100 (or very close to it)
@@ -313,4 +305,42 @@ public class ClaimAnalyticsTest extends BaseClaimTest {
         }
     }
 
+    @Test
+    public void testGetTopKClaimsWithEmptyRequest() {
+        // Create an empty request
+        TopKClaimRequest request = new TopKClaimRequest();
+
+        // Call the getTopKClaims method with the empty request
+        assertThrows(ConstraintViolationException.class, () -> analyticsService.getTopKClaims(request));
+    }
+
+    @Test
+    public void testGetChartAnalyticsWithEmptyRequest() {
+        // Create an empty request
+        ChartAnalyticsRequest request = new ChartAnalyticsRequest();
+
+        // Call the getChartAnalytics method with the empty request and assert that it throws a ConstraintViolationException
+        assertThrows(ConstraintViolationException.class, () -> analyticsService.getChartAnalytics(request));
+    }
+
+    @Test
+    public void testGetTopKClaimsWithInvalidInput() {
+        // Create an invalid request
+        TopKClaimRequest request = new TopKClaimRequest();
+        request.setTarget("nonExistentUser");
+
+        // Call the getTopKClaims method with the invalid request and assert that it throws a ConstraintViolationException
+        assertThrows(ConstraintViolationException.class, () -> analyticsService.getTopKClaims(request));
+    }
+
+    @Test
+    public void testGetChartAnalyticsWithInvalidInput() {
+        // Create an invalid request
+        ChartAnalyticsRequest request = new ChartAnalyticsRequest();
+        request.setChartType("invalidChartType");
+        request.setAggregateType("invalidAggregateType");
+
+        // Call the getChartAnalytics method with the invalid request
+        assertThrows(ConstraintViolationException.class, () -> analyticsService.getChartAnalytics(request));
+    }
 }

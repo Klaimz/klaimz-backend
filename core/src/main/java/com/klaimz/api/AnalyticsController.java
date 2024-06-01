@@ -13,6 +13,7 @@ import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.security.annotation.Secured;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 
 import static com.klaimz.util.HttpUtils.success;
 import static io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED;
@@ -26,13 +27,13 @@ public class AnalyticsController {
     private AnalyticsService analyticsService;
 
     @Post("/claim")
-    public HttpResponse<MessageBean> getClaimAnalytics(@Body ChartAnalyticsRequest request) {
+    public HttpResponse<MessageBean> getClaimAnalytics(@Valid @Body ChartAnalyticsRequest request) {
         var result = analyticsService.getChartAnalytics(request);
         return success(result, "Claim analytics fetched");
     }
 
     @Post("/top")
-    public HttpResponse<MessageBean> getTopAnalytics(@Body TopKClaimRequest request) {
+    public HttpResponse<MessageBean> getTopAnalytics(@Valid @Body TopKClaimRequest request) {
         var result = analyticsService.getTopKClaims(request);
         return success(result, "Top K records fetched");
     }

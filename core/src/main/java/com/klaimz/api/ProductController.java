@@ -13,6 +13,8 @@ import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.security.annotation.Secured;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 
 import static com.klaimz.util.HttpUtils.*;
 import static io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED;
@@ -27,7 +29,7 @@ public class ProductController {
     private ProductService productService;
 
     @Get("/{id}")
-    public HttpResponse<MessageBean> getProductById(String id) {
+    public HttpResponse<MessageBean> getProductById(@NotBlank String id) {
         var product = productService.getProductById(id);
         return success(product, "Product found");
     }
@@ -39,7 +41,7 @@ public class ProductController {
     }
 
     @Post
-    public HttpResponse<MessageBean> createProduct(@Body Product product) {
+    public HttpResponse<MessageBean> createProduct(@Valid @Body Product product) {
         product.setId(null); // ensure id is not set, it will be generated
         var newProduct = productService.createProduct(product);
         return success(newProduct, "Product created successfully");

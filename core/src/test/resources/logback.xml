@@ -26,7 +26,7 @@
 <!--    <logger name="io.micronaut" level="trace" />-->
 
 <!--    <logger name="io.micronaut.data" level="trace" />-->
-    <logger name="org.mongodb" level="debug" />
+<!--    <logger name="org.mongodb" level="debug" />-->
 
 
 </configuration>

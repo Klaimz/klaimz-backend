@@ -9,6 +9,7 @@ import com.klaimz.util.EntityValidators;
 import com.klaimz.util.MongoUtils;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import jakarta.validation.Valid;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
@@ -58,7 +59,7 @@ public class ClaimService {
     }
 
 
-    public Claim createClaim(@NonNull Claim claim, @NonNull String requesterId) {
+    public Claim createClaim(@Valid @NonNull Claim claim, @NonNull String requesterId) {
 
         claim.setRequester(User.builder().id(requesterId).build());
         claim.setStatus(Constants.STATUS_NEW);
@@ -74,7 +75,7 @@ public class ClaimService {
     }
 
 
-    public Claim updateClaim(Claim claim, boolean update) {
+    public Claim updateClaim(@Valid Claim claim, boolean update) {
         entityValidators.validateClaim(claim);
 
         claim.getFields().forEach(field -> {

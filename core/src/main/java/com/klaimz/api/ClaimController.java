@@ -15,6 +15,8 @@ import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.security.annotation.Secured;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,20 +39,20 @@ public class ClaimController {
 
 
     @Get("/{id}")
-    public HttpResponse<MessageBean> getClaimById(@NonNull String id) {
+    public HttpResponse<MessageBean> getClaimById(@NotBlank String id) {
         var claim = claimService.getClaimById(id);
         return success(claim, "Claim found");
     }
 
     @Post("/{id}/comment")
-    public HttpResponse<MessageBean> addComment(@NonNull String id, @Body GenericDto comment, @NonNull Principal principal) {
+    public HttpResponse<MessageBean> addComment(@NotBlank String id, @Valid @Body GenericDto comment, @NonNull Principal principal) {
         var userId = principal.getName();
         var claim = claimService.addComment(id, comment.getBody(), userId);
         return success(claim, "Comment added");
     }
 
     @Post("/{id}/status")
-    public HttpResponse<MessageBean> updateStatus(@NonNull String id, @Body GenericDto status, @NonNull Principal principal) {
+    public HttpResponse<MessageBean> updateStatus(@NonNull String id, @Valid @Body GenericDto status, @NonNull Principal principal) {
         var userId = principal.getName();
 
 
@@ -59,7 +61,7 @@ public class ClaimController {
     }
 
     @Post("/{id}/{fieldKey}/upload")
-    public HttpResponse<MessageBean> upload(@PathVariable String fieldKey, @PathVariable String id, @QueryValue("file") String fileName) {
+    public HttpResponse<MessageBean> upload(@NotBlank @PathVariable String fieldKey, @NotBlank @PathVariable String id, @NotBlank @QueryValue("file") String fileName) {
         var claim = claimService.getClaimById(id);
         var field = claim.getField(fieldKey);
 
@@ -85,7 +87,7 @@ public class ClaimController {
     }
 
     @Get("/{id}/{fieldKey}/download")
-    public HttpResponse download(@PathVariable String fieldKey, @PathVariable String id, @QueryValue("file") String fileName) throws URISyntaxException {
+    public HttpResponse download(@NotBlank @PathVariable String fieldKey, @NotBlank @PathVariable String id, @NotBlank @QueryValue("file") String fileName) throws URISyntaxException {
         var presignedUrlDto = s3FileService.generatePresignedGetUrl(id, fieldKey, fileName);
         var url = presignedUrlDto.getUrl();
 
@@ -93,13 +95,13 @@ public class ClaimController {
     }
 
     @Post
-    public HttpResponse<MessageBean> createClaim(@Body Claim claim, @NonNull Principal principal) {
+    public HttpResponse<MessageBean> createClaim(@Valid @Body Claim claim, @NonNull Principal principal) {
         var newClaim = claimService.createClaim(claim, principal.getName());
         return success(newClaim, "Claim created successfully");
     }
 
     @Patch("/{id}")
-    public HttpResponse<MessageBean> updateClaim(String id, @Body Claim claim) {
+    public HttpResponse<MessageBean> updateClaim(String id, @Valid @Body Claim claim) {
 
         if (!claim.getId().equals(id)) {
             return badRequest("Claim id mismatch");
@@ -118,7 +120,7 @@ public class ClaimController {
     }
 
     @Post("/search")
-    public HttpResponse<MessageBean> search(@Body List<Filter> filters) {
+    public HttpResponse<MessageBean> search(@Valid @Body List<Filter> filters) {
         var result = claimService.findByField(filters);
         return success(result, "Claim search result");
     }
@@ -131,7 +133,7 @@ public class ClaimController {
     }
 
     @Post("/types")
-    public HttpResponse<MessageBean> createClaimType(@Body ClaimType claimType) {
+    public HttpResponse<MessageBean> createClaimType(@Valid @Body ClaimType claimType) {
         var newClaimType = claimService.createClaimType(claimType);
         return success(newClaimType, "Claim type created successfully");
     }

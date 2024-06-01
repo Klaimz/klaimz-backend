@@ -3,6 +3,7 @@ package com.klaimz.model;
 
 import io.micronaut.serde.ObjectMapper;
 import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -11,6 +12,8 @@ import java.io.IOException;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class UserSignUp extends User {
+
+    @NotBlank(message = "Password is required")
     private String password;
 
     public User convertToUser() {

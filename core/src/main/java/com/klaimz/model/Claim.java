@@ -4,6 +4,8 @@ import io.micronaut.core.annotation.Introspected;
 import io.micronaut.data.annotation.*;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -21,14 +23,23 @@ public class Claim {
     @Id
     @GeneratedValue
     private String id;
+
+    @Positive (message = "Claim must have a valid amount")
     private double amount;
 
     @DateCreated
     private Date createdDate;
 
+    @NotBlank(message = "Claim must have a status")
+
     private String status;
 
+    @NotEmpty(message = "Claim must have products")
+    @Valid
     private List<ProductDTO> products;
+
+    @NotEmpty(message = "Claim must have fields")
+    @Valid
     private List<FormFieldValue> fields;
 
     @DateUpdated
@@ -48,6 +59,8 @@ public class Claim {
     @Builder.Default
     private ArrayList<ClaimUpdate> updates = new ArrayList<>();
 
+
+    @NotBlank(message = "Claim must have a claim template id")
     private String claimTemplateId;
 
     @Data
@@ -56,7 +69,9 @@ public class Claim {
     @Getter
     @Builder
     public static class FormFieldValue {
+        @NotBlank(message = "Field must have a key")
         private String key;
+        @NotBlank(message = "Field must have a type")
         private String type;
         private String value;
     }
@@ -67,14 +82,26 @@ public class Claim {
     @Getter
     @Builder
     public static class ProductDTO {
+
+        @NotBlank(message = "Product must have a valid id")
         private String id;
+        @NotBlank(message = "Product must have a valid description")
         private String description;
+
+        @Positive(message = "Product must have a valid quantity")
         private int quantity;
 
-//        auto fetch field values from product table
+        @Positive(message = "Product must have a valid mrp")
         private double mrp;
+
+
+        @NotBlank(message = "Product must have a valid name")
         private String name;
         private String uid;
+
+
+        @Positive(message = "Product must have a valid GST percentage")
+        @DecimalMax(value = "28", message = "Product GST percentage must be between 1 and 28")
         private double gstPercentage;
     }
 
