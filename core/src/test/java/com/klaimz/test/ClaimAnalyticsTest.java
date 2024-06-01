@@ -2,6 +2,7 @@ package com.klaimz.test;
 
 import com.klaimz.model.ChartEntry;
 import com.klaimz.model.Claim;
+import com.klaimz.model.User;
 import com.klaimz.model.api.ChartAnalyticsRequest;
 import com.klaimz.model.api.Filter;
 import com.klaimz.model.api.TopKClaimRequest;
@@ -282,11 +283,73 @@ public class ClaimAnalyticsTest extends BaseClaimTest {
                         product ->
                                 product.getName().equals(productName)) &&
                                  claim.getStatus().equals(STATUS_APPROVED))
-                .collect(groupingBy(claim -> claim.getRequester().getId(), collectingAndThen(minBy(Comparator.comparingDouble(Claim::getAmount)), optionalClaim -> optionalClaim.get().getAmount())))
+                .collect(groupingBy(claim -> claim.getRequester().getId(),
+                        collectingAndThen(minBy(Comparator.comparingDouble(Claim::getAmount)),
+                                optionalClaim -> optionalClaim.get().getAmount())))
                 .entrySet().stream()
                 .map(entry -> ChartEntry.builder().x(entry.getKey()).y(entry.getValue()).build())
                 .sorted(Comparator.comparing(ChartEntry::getX))
                 .toList();
+
+        assertEquals(expectedData.size(), result.size());
+
+        var expectedSum = expectedData.stream().mapToDouble(ChartEntry::getY).sum();
+
+        assertEquals(expectedSum, sum, 0.001);
+
+        result = result.stream()
+                .sorted(Comparator.comparing(ChartEntry::getX))
+                .toList();
+
+        assertEquals(expectedData.size(), result.size());
+        for (int i = 0; i < expectedData.size(); i++) {
+            assertEquals(expectedData.get(i).getX(), result.get(i).getX());
+            assertEquals(expectedData.get(i).getY(), result.get(i).getY(), 0.001);
+        }
+    }
+
+    @Test
+    public void testChartAnalyticsRequesterVsMaxAmount() {
+        String productName = this.testDataContainer.getProducts().get(0).getName();
+        User user = this.testDataContainer.getUsers().get(0);
+
+        // Create a ChartAnalyticsRequest object
+        ChartAnalyticsRequest request = new ChartAnalyticsRequest();
+        request.setChartType(CHART_TYPE_PIE);
+        request.setFilters(List.of(
+                new Filter("products.id", productName),
+                new Filter("status", STATUS_DENIED),
+                new Filter("requester._id", user.getId())
+        ));
+        request.setGroupBy("requester.displayName");
+        request.setAggregateBy("status");
+        request.setAggregateType("count");
+
+        // Call the getChartAnalytics method
+        List<ChartEntry> result = analyticsService.getChartAnalytics(request);
+
+
+        // Verify that the percentages sum up to 100 (or very close to it)
+        var sum = result.stream().mapToDouble(ChartEntry::getY).sum();
+
+
+        // Calculate the expected data manually
+        List<ChartEntry> chartData = testDataContainer.getClaims()
+                .stream()
+                .filter(claim -> claim.getProducts().stream().anyMatch(
+                        product ->
+                                product.getName().equals(productName)) &&
+                                 claim.getStatus().equals(STATUS_DENIED) &&
+                                    claim.getRequester().getId().equals(user.getId()))
+                .collect(groupingBy(claim -> claim.getRequester().getId(),
+                        collectingAndThen(maxBy(Comparator.comparingDouble(Claim::getAmount)),
+                                optionalClaim -> optionalClaim.get().getAmount())))
+                .entrySet().stream()
+                .map(entry -> ChartEntry.builder().x(entry.getKey()).y(entry.getValue()).build())
+                .sorted(Comparator.comparing(ChartEntry::getX))
+                .toList();
+
+        var expectedData = convertToPie(chartData);
 
         assertEquals(expectedData.size(), result.size());
 
