@@ -14,4 +14,19 @@ public class TopKClaimRequest implements FilterableRequest {
     private String target;
     private String sortBy;
     private int limit;
+
+
+    @Override
+    public List<String> getFields() {
+        var fields = getFilterFields();
+
+        if (target != null) {
+            fields.add(target);
+        }
+        if (sortBy != null) {
+            fields.add(sortBy);
+        }
+
+        return fields;
+    }
 }

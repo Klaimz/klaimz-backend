@@ -1,9 +1,7 @@
 package com.klaimz.service;
 
 
-import com.klaimz.model.Claim;
-import com.klaimz.model.ClaimType;
-import com.klaimz.model.User;
+import com.klaimz.model.*;
 import com.klaimz.model.api.Filter;
 import com.klaimz.repo.*;
 import com.klaimz.util.Constants;
@@ -11,6 +9,9 @@ import com.klaimz.util.EntityValidators;
 import com.klaimz.util.MongoUtils;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NonNull;
 import org.bson.conversions.Bson;
 
 import java.util.List;
@@ -37,7 +38,8 @@ public class ClaimService {
     private UserRepository userRepository;
 
 
-    public Claim getClaimById(String id) {
+    public Claim getClaimById(@NonNull String id) {
+
         var claim = claimRepository.findById(id);
         if (claim.isEmpty()) {
             throw new IllegalArgumentException("Claim not found");
@@ -56,7 +58,7 @@ public class ClaimService {
     }
 
 
-    public Claim createClaim(Claim claim, String requesterId) {
+    public Claim createClaim(@NonNull Claim claim, @NonNull String requesterId) {
 
         claim.setRequester(User.builder().id(requesterId).build());
         claim.setStatus(Constants.STATUS_NEW);

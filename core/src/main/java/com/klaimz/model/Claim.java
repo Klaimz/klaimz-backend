@@ -54,6 +54,7 @@ public class Claim {
     @Introspected
     @Serdeable
     @Getter
+    @Builder
     public static class FormFieldValue {
         private String key;
         private String type;
@@ -64,6 +65,7 @@ public class Claim {
     @Introspected
     @Serdeable
     @Getter
+    @Builder
     public static class ProductDTO {
         private String id;
         private String description;

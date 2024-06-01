@@ -1,5 +1,6 @@
 package com.klaimz.util;
 
+import com.klaimz.model.ChartEntry;
 import com.klaimz.model.Claim;
 import com.klaimz.model.FilterableRequest;
 import com.klaimz.model.User;
@@ -16,13 +17,11 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import static com.mongodb.client.model.Aggregates.unwind;
-
 public final class MongoUtils {
 
     public static final String TO_DOUBLE = "$toDouble";
 
-    private static final Map<Class<?>, BiFunction<String, String, BsonValue>> classToMatchId = new HashMap<>();
+    private static final Map<Class<?>, BiFunction<String, String, Bson>> classToMatchId = new HashMap<>();
     public static final String X = "x";
     public static final String Y = "y";
     public static final List<String> USER_FIELDS = Arrays
@@ -68,9 +67,11 @@ public final class MongoUtils {
     public static Bson match(List<Filter> filters, Class<?> clazz) {
         BsonDocument matchBody = new BsonDocument();
         var matchFunction = classToMatchId.get(clazz);
-        filters.forEach(filter -> matchBody.append(filter.getField(),
-                matchFunction.apply(filter.getField(), filter.getValue())
-        ));
+        filters.forEach(filter -> {
+                    var bsonFilter = matchFunction.apply(filter.getField(), filter.getValue()).toBsonDocument();
+                    var key = bsonFilter.getFirstKey();
+                    matchBody.append(key, bsonFilter.get(key));
+        });
         return matchBody;
     }
 
@@ -100,18 +101,30 @@ public final class MongoUtils {
         return Aggregates.group(groupBy, accumulators);
     }
 
-    public static BsonValue matchIdClaim(String field, String value) {
+    public static List<ChartEntry> convertToPie(List<ChartEntry> data) {
+        var total = data.stream().mapToDouble(ChartEntry::getY).sum();
+        for (var entry : data) {
+            double yRounded = Math.round(entry.getY() * 1000000.0 / total) / 10000.0;
+            entry.setY(yRounded);
+        }
+        return data;
+    }
+
+    public static Bson matchIdClaim(String field, String value) {
 
         if (isOfUser(List.of(field)) && field.contains("._id")) {
-            return new BsonObjectId(new ObjectId(value));
+            return bson(field, new BsonObjectId(new ObjectId(value)));
         }
-        return new BsonString(value);
+
+        if (field.startsWith("products.")) {
+            return bson("products", bson("$elemMatch", bson(field.replace("products.", ""), bsonV(value))));
+        }
+        return bson(field, new BsonString(value));
     }
 
     public static boolean isOfUser(List<String> matchField) {
-        return USER_FIELDS.stream()
-                .anyMatch(field -> matchField.stream().
-                        anyMatch(field::contains));
+        return matchField.stream()
+                .anyMatch(field -> USER_FIELDS.stream().anyMatch(field::contains));
     }
 
     public static List<String> findUserFields(List<String> matchField) {
@@ -123,8 +136,8 @@ public final class MongoUtils {
     }
 
 
-    public static BsonValue matchIdUser(String field, String value) {
-        return new BsonString(value);
+    public static Bson matchIdUser(String field, String value) {
+        return bson(field,new BsonString(value));
     }
 
 
@@ -155,13 +168,11 @@ public final class MongoUtils {
     }
 
     private static ArrayList<Bson> createFilterablePipeline(FilterableRequest request) {
-        if (request.getFilters() == null || request.getFilters().isEmpty()) {
+        if (request.getFields() == null || request.getFields().isEmpty()) {
             return new ArrayList<>();
         }
 
-        var filterFields = request.getFilters()
-                .stream().map(Filter::getField)
-                .toList();
+        var filterFields = request.getFields();
 
         var userFilterFields = findUserFields(filterFields);
         var pipeline = userFilterFields.stream()
@@ -169,14 +180,10 @@ public final class MongoUtils {
                 .flatMap(Collection::stream)
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        var containsProducts = filterFields.stream()
-                .anyMatch(field -> field.startsWith("products."));
 
-        if (containsProducts) {
-            pipeline.add(unwind("$products"));
+        if (request.getFilters() != null && !request.getFilters().isEmpty()) {
+            pipeline.add(aggregateMatch(request.getFilters(), Claim.class));
         }
-
-        pipeline.add(aggregateMatch(request.getFilters(), Claim.class));
         return pipeline;
     }
 

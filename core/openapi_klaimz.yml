@@ -364,6 +364,10 @@ components:
     ChartAnalyticsRequest:
       type: object
       properties:
+        fields:
+          type: array
+          items:
+            type: string
         filters:
           type: array
           items:
@@ -458,6 +462,10 @@ components:
         user:
           type: string
     Claim.FormFieldValue:
+      required:
+      - key
+      - type
+      - value
       type: object
       properties:
         key:
@@ -467,6 +475,14 @@ components:
         value:
           type: string
     Claim.ProductDTO:
+      required:
+      - description
+      - gst-percentage
+      - id
+      - mrp
+      - name
+      - quantity
+      - uid
       type: object
       properties:
         id:
@@ -540,6 +556,10 @@ components:
     TopKClaimRequest:
       type: object
       properties:
+        fields:
+          type: array
+          items:
+            type: string
         filters:
           type: array
           items:
