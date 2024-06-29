@@ -143,12 +143,14 @@ public abstract class BaseClaimTest {
                 .build();
         var fields = Arrays.asList(field1, field2, field3, field4, field5);
 
+//                create random dates in the past one year
 
+        var createdDate = new Date(System.currentTimeMillis() - (long) (random.nextDouble() * 365 * 24 * 60 * 60 * 1000));
         // Build the claim
         var claimBuilder = Claim.builder()
                 .requester(randomUser)
                 .amount(Math.ceil(random.nextDouble() * 100))
-                .createdDate(new Date())
+                .createdDate(createdDate)
                 .status("New")
                 .claimTemplateId(random.nextInt(1000) + "")
                 .products(products)
@@ -178,6 +180,12 @@ public abstract class BaseClaimTest {
                     .evaluator(userData.get(random.nextInt(userData.size())));
         }
 
+        if (random.nextBoolean()) {
+            // get a random date after the created date and before the current date
+            claimBuilder = claimBuilder
+                    .updateDate(new Date(createdDate.getTime() +
+             (long) (random.nextDouble() * (System.currentTimeMillis() - createdDate.getTime()))));
+        }
 
         return claimBuilder.build();
     }

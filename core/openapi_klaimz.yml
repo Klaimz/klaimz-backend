@@ -521,17 +521,13 @@ components:
           type: integer
           format: int32
         mrp:
-          minimum: 0
           type: number
           format: double
         name:
-          minLength: 1
           type: string
         uid:
           type: string
         gst-percentage:
-          maximum: 28
-          minimum: 0
           type: number
           format: double
     ClaimType:
@@ -548,15 +544,27 @@ components:
     Filter:
       required:
       - field
-      - value
       type: object
       properties:
         field:
           minLength: 1
           type: string
         value:
-          minLength: 1
           type: string
+          nullable: true
+        range:
+          $ref: '#/components/schemas/Filter.Range'
+    Filter.Range:
+      type: object
+      properties:
+        from:
+          minimum: 0
+          type: integer
+          format: int64
+        to:
+          minimum: 0
+          type: integer
+          format: int64
     GenericDto:
       required:
       - body

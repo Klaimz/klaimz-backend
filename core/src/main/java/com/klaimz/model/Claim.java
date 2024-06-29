@@ -43,6 +43,7 @@ public class Claim {
     private List<FormFieldValue> fields;
 
     @DateUpdated
+//    @Convert(converter = DateToUnixTimestampConverter.class)
     private Date updateDate;
 
 

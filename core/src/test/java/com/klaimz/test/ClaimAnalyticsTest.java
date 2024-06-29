@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import static com.klaimz.util.Constants.*;
@@ -69,9 +70,10 @@ public class ClaimAnalyticsTest extends BaseClaimTest {
         // pick a random user
         var user = testDataContainer.getUsers().get(random.nextInt(testDataContainer.getUsers().size()));
 
-
         TopKClaimRequest request = new TopKClaimRequest();
-        request.setFilters(List.of(new Filter("requester.displayName", user.getDisplayName())));
+        request.setFilters(List.of(
+                Filter.builder().
+                        field("requester.displayName").value(user.getDisplayName()).build()));
         request.setTarget("requester.displayName");
         request.setSortBy("amount");
         request.setLimit(3);
@@ -118,11 +120,12 @@ public class ClaimAnalyticsTest extends BaseClaimTest {
 
     @Test
     public void testChartAnalyticsRequesterStatusVsAmount() {
-        String displayName = this.testDataContainer.getUsers().get(0).getDisplayName();
+        String displayName = this.testDataContainer.getClaims().get(0).getRequester().getDisplayName();
         // Create a ChartAnalyticsRequest object
         ChartAnalyticsRequest request = new ChartAnalyticsRequest();
         request.setChartType(CHART_TYPE_PIE);
-        request.setFilters(List.of(new Filter("requester.displayName", displayName)));
+        request.setFilters(List.of(
+                Filter.builder().field("requester.displayName").value(displayName).build()));
         request.setGroupBy("status");
         request.setAggregateBy("amount");
         request.setAggregateType("sum");
@@ -212,7 +215,9 @@ public class ClaimAnalyticsTest extends BaseClaimTest {
         // Create a ChartAnalyticsRequest object
         ChartAnalyticsRequest request = new ChartAnalyticsRequest();
         request.setChartType(CHART_TYPE_BAR);
-        request.setFilters(List.of(new Filter("products.name", productName)));
+        request.setFilters(List.of(
+                Filter.builder().field("products.name").value(productName).build()
+        ));
         request.setGroupBy("requester.displayName");
         request.setAggregateBy("amount");
         request.setAggregateType("avg");
@@ -261,8 +266,8 @@ public class ClaimAnalyticsTest extends BaseClaimTest {
         ChartAnalyticsRequest request = new ChartAnalyticsRequest();
         request.setChartType(CHART_TYPE_BAR);
         request.setFilters(List.of(
-                new Filter("products.name", productName),
-                new Filter("status", STATUS_APPROVED)
+                Filter.builder().field("products.name").value(productName).build(),
+                Filter.builder().field("status").value(STATUS_APPROVED).build()
         ));
         request.setGroupBy("requester._id");
         request.setAggregateBy("amount");
@@ -316,7 +321,7 @@ public class ClaimAnalyticsTest extends BaseClaimTest {
         ChartAnalyticsRequest request = new ChartAnalyticsRequest();
         request.setChartType(CHART_TYPE_PIE);
         request.setFilters(List.of(
-                new Filter("products.name", productName)
+                Filter.builder().field("products.name").value(productName).build()
         ));
         request.setGroupBy("requester.displayName");
         request.setAggregateBy("amount");
@@ -357,6 +362,62 @@ public class ClaimAnalyticsTest extends BaseClaimTest {
                 .toList();
 
         assertEquals(expectedData.size(), result.size());
+        for (int i = 0; i < expectedData.size(); i++) {
+            assertEquals(expectedData.get(i).getX(), result.get(i).getX());
+            assertEquals(expectedData.get(i).getY(), result.get(i).getY(), 0.001);
+        }
+    }
+
+    @Test
+    public void testChartAnalyticsFilterDate() {
+        // calculate the avg crated date
+        var avgCreatedUnixTime = (long) Math.floor(testDataContainer.getClaims().stream()
+                .mapToLong(it -> it.getCreatedDate().getTime())
+                .average()
+                .orElse(0));
+        var currentDate = new Date().getTime();
+
+        // Create a ChartAnalyticsRequest object
+        ChartAnalyticsRequest request = new ChartAnalyticsRequest();
+        request.setChartType(CHART_TYPE_PIE);
+        request.setFilters(List.of(
+                Filter.builder().
+                        field("createdDate").range(Filter.Range.builder().from(avgCreatedUnixTime).to(currentDate).build()).build()
+        ));
+        request.setGroupBy("status");
+        request.setAggregateBy("status");
+        request.setAggregateType("count");
+
+        // Call the getChartAnalytics method
+        List<ChartEntry> result = analyticsService.getChartAnalytics(request);
+
+        // Verify that the returned list is not empty
+        assertFalse(result.isEmpty());
+
+//        // Verify that the percentages sum up to 100 (or very close to it)
+        double sum = result.stream().mapToDouble(ChartEntry::getY).sum();
+        assertEquals(100, sum, 0.01);
+
+        // Calculate the expected data manually
+        List<ChartEntry> claimRecords = testDataContainer.getClaims()
+                .stream()
+                .filter(claim -> claim.getCreatedDate().getTime() >= avgCreatedUnixTime
+                                 && claim.getCreatedDate().getTime() <= currentDate)
+                .collect(groupingBy(Claim::getStatus, counting()))
+                .entrySet().stream()
+                .map(entry -> ChartEntry.builder().x(entry.getKey()).y(Double.valueOf(entry.getValue())).build())
+                .sorted(Comparator.comparing(ChartEntry::getX))
+                .toList();
+
+        //  convert to percentage
+        var expectedData = convertToPie(claimRecords);
+
+        result = result.stream()
+                .sorted(Comparator.comparing(ChartEntry::getX))
+                .toList();
+
+        assertEquals(expectedData.size(), result.size());
+
         for (int i = 0; i < expectedData.size(); i++) {
             assertEquals(expectedData.get(i).getX(), result.get(i).getX());
             assertEquals(expectedData.get(i).getY(), result.get(i).getY(), 0.001);

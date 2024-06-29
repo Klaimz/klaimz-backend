@@ -15,6 +15,7 @@ import org.bson.types.ObjectId;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Aggregates.unwind;
@@ -23,12 +24,17 @@ public final class MongoUtils {
 
     public static final String TO_DOUBLE = "$toDouble";
 
-    private static final Map<Class<?>, BiFunction<String, String, Bson>> classToMatchId = new HashMap<>();
+    private static final Map<Class<?>, Function<Filter, Bson>> classToMatchId = new HashMap<>();
     public static final String X = "x";
     public static final String Y = "y";
     public static final List<String> USER_FIELDS = Arrays
             .stream(Claim.class.getDeclaredFields())
             .filter(field -> field.getType().equals(User.class))
+            .map(Field::getName)
+            .toList();
+    public static final List<String> DATE_FIELDS = Arrays
+            .stream(Claim.class.getDeclaredFields())
+            .filter(field -> field.getType().equals(Date.class))
             .map(Field::getName)
             .toList();
 
@@ -70,7 +76,7 @@ public final class MongoUtils {
         BsonDocument matchBody = new BsonDocument();
         var matchFunction = classToMatchId.get(clazz);
         filters.forEach(filter -> {
-                    var bsonFilter = matchFunction.apply(filter.getField(), filter.getValue()).toBsonDocument();
+                    var bsonFilter = matchFunction.apply(filter).toBsonDocument();
                     var key = bsonFilter.getFirstKey();
                     matchBody.append(key, bsonFilter.get(key));
         });
@@ -112,7 +118,15 @@ public final class MongoUtils {
         return data;
     }
 
-    public static Bson matchIdClaim(String field, String value) {
+    public static Bson matchIdClaim(Filter filter) {
+        var field = filter.getField();
+        var value = filter.getValue();
+
+        if (isOfDate(List.of(field))) {
+            var range = filter.getRange();
+            return bson(field, bson("$gte", new BsonDateTime(range.getFrom()))
+                    .append("$lte", new BsonDateTime(range.getTo())));
+        }
 
         if (isOfUser(List.of(field)) && field.contains("._id")) {
             return bson(field, new BsonObjectId(new ObjectId(value)));
@@ -128,6 +142,10 @@ public final class MongoUtils {
         return matchField.stream()
                 .anyMatch(field -> USER_FIELDS.stream().anyMatch(field::contains));
     }
+    public static boolean isOfDate(List<String> matchField) {
+        return matchField.stream()
+                .anyMatch(field -> DATE_FIELDS.stream().anyMatch(field::contains));
+    }
 
     public static List<String> findUserFields(List<String> matchField) {
         return matchField.stream()
@@ -138,7 +156,9 @@ public final class MongoUtils {
     }
 
 
-    public static Bson matchIdUser(String field, String value) {
+    public static Bson matchIdUser(Filter filter) {
+        var field = filter.getField();
+        var value = filter.getValue();
         return bson(field,new BsonString(value));
     }
 
